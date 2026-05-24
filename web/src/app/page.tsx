@@ -35,6 +35,7 @@ export default function Home() {
         </div>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Link href="/privacy" style={navLinkStyle}>Privacy</Link>
+          <Link href="/support" style={navLinkStyle}>Support</Link>
           <Link href="/login" style={navLinkStyle}>Sign in</Link>
           <Link href="/register" style={primaryLinkStyle}>Request access</Link>
         </nav>
@@ -161,6 +162,17 @@ export default function Home() {
             textDecoration: "none",
           }}>
             Read the full privacy policy
+          </Link>
+          <Link href="/support" style={{
+            display: "inline-flex",
+            marginTop: 16,
+            marginLeft: 18,
+            color: "#023465",
+            fontSize: 13,
+            fontWeight: 800,
+            textDecoration: "none",
+          }}>
+            Contact support
           </Link>
         </div>
       </section>

@@ -33,17 +33,28 @@ export default function PrivacyPage() {
             PinCapture
           </span>
         </Link>
-        <Link href="/login" style={{
-          color: "#023465",
-          background: "#ffdd00",
-          textDecoration: "none",
-          fontSize: 13,
-          fontWeight: 800,
-          padding: "9px 14px",
-          borderRadius: 7,
-        }}>
-          Sign in
-        </Link>
+        <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/support" style={{
+            color: "rgba(255,255,255,0.78)",
+            textDecoration: "none",
+            fontSize: 13,
+            fontWeight: 700,
+            padding: "8px 12px",
+          }}>
+            Support
+          </Link>
+          <Link href="/login" style={{
+            color: "#023465",
+            background: "#ffdd00",
+            textDecoration: "none",
+            fontSize: 13,
+            fontWeight: 800,
+            padding: "9px 14px",
+            borderRadius: 7,
+          }}>
+            Sign in
+          </Link>
+        </nav>
       </header>
 
       <section style={{
