@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const LEGACY_ARCHIVE_PREFIX = "[PinCapture archived at ";
 const STATUS_RE = /^\[PinCapture status=(archived|trashed|deleted) at ([^\]]+)\]\n?/;
+const TICKET_PREFIX = "[PinCapture ticket]\n";
 
 type GuideStatus = "active" | "archived" | "trashed" | "deleted";
 
@@ -74,6 +75,7 @@ export async function GET(req: NextRequest) {
       : "active";
 
   const guides = (data ?? [])
+    .filter((guide: any) => !guide.description?.startsWith(TICKET_PREFIX))
     .map((guide: any) => {
       const stepDates = (guide.steps ?? [])
         .map((step: { created_at?: string }) => step.created_at)

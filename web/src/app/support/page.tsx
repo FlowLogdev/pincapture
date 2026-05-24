@@ -3,6 +3,14 @@
 import { type CSSProperties, type FormEvent, useState } from "react";
 import Link from "next/link";
 
+type CreatedTicket = {
+  ticketId: string;
+  subject: string;
+  requesterEmail: string;
+  status: string;
+  progress: number;
+};
+
 export default function SupportPage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -10,6 +18,7 @@ export default function SupportPage() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
+  const [createdTicket, setCreatedTicket] = useState<CreatedTicket | null>(null);
 
   async function submitTicket(event: FormEvent) {
     event.preventDefault();
@@ -24,7 +33,8 @@ export default function SupportPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not submit support ticket.");
-      setStatus(`Ticket ${data.ticketId} created. A copy was sent to your email.`);
+      setCreatedTicket(data.ticket);
+      setStatus("");
       setMessage("");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not submit support ticket.");
@@ -54,6 +64,44 @@ export default function SupportPage() {
           capture problems, export issues, dashboard errors, or account questions.
         </p>
 
+        {createdTicket ? (
+          <div style={panelStyle}>
+            <div style={successBadgeStyle}>Ticket created</div>
+            <h2 style={{ color: "#023465", fontSize: 24, margin: "12px 0 10px" }}>
+              Ticket information has been sent
+            </h2>
+            <p style={{ color: "#475569", lineHeight: 1.7, fontSize: 15, margin: "0 0 18px" }}>
+              Your support request was sent to support@flowlog.dev and fabio.almeida@pinvestcapital.com.
+              A copy was also sent to {createdTicket.requesterEmail}.
+            </p>
+            <div style={ticketSummaryStyle}>
+              <div>
+                <span style={summaryLabelStyle}>Ticket number</span>
+                <strong style={summaryValueStyle}>{createdTicket.ticketId}</strong>
+              </div>
+              <div>
+                <span style={summaryLabelStyle}>Status</span>
+                <strong style={summaryValueStyle}>Ticket submitted</strong>
+              </div>
+              <div>
+                <span style={summaryLabelStyle}>Subject</span>
+                <strong style={summaryValueStyle}>{createdTicket.subject}</strong>
+              </div>
+            </div>
+            <div style={progressTrackStyle}>
+              <div style={{ ...progressFillStyle, width: `${createdTicket.progress || 10}%` }} />
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
+              <button
+                onClick={() => setCreatedTicket(null)}
+                style={buttonStyle}
+              >
+                Open another ticket
+              </button>
+              <Link href="/dashboard" style={secondaryButtonStyle}>Check ticket status</Link>
+            </div>
+          </div>
+        ) : (
         <div style={panelStyle}>
           <div style={{ marginBottom: 20 }}>
             <h2 style={{ color: "#023465", fontSize: 20, margin: "0 0 8px" }}>Open a support ticket</h2>
@@ -102,6 +150,7 @@ export default function SupportPage() {
             </p>
           )}
         </div>
+        )}
       </section>
     </main>
   );
@@ -215,4 +264,64 @@ const buttonStyle: CSSProperties = {
   padding: "12px 14px",
   fontWeight: 800,
   cursor: "pointer",
+};
+
+const secondaryButtonStyle: CSSProperties = {
+  background: "#fff",
+  color: "#023465",
+  border: "1px solid #cbd5e1",
+  borderRadius: 7,
+  padding: "12px 14px",
+  fontWeight: 800,
+  textDecoration: "none",
+  fontSize: 14,
+};
+
+const successBadgeStyle: CSSProperties = {
+  display: "inline-flex",
+  background: "#dcfce7",
+  color: "#166534",
+  borderRadius: 999,
+  padding: "6px 10px",
+  fontSize: 12,
+  fontWeight: 800,
+};
+
+const ticketSummaryStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: 12,
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: 8,
+  padding: 16,
+};
+
+const summaryLabelStyle: CSSProperties = {
+  display: "block",
+  color: "#64748b",
+  fontSize: 12,
+  fontWeight: 800,
+  marginBottom: 4,
+};
+
+const summaryValueStyle: CSSProperties = {
+  display: "block",
+  color: "#023465",
+  fontSize: 15,
+  lineHeight: 1.35,
+};
+
+const progressTrackStyle: CSSProperties = {
+  height: 12,
+  background: "#e2e8f0",
+  borderRadius: 999,
+  overflow: "hidden",
+  marginTop: 18,
+};
+
+const progressFillStyle: CSSProperties = {
+  height: "100%",
+  background: "#22c55e",
+  borderRadius: 999,
 };
