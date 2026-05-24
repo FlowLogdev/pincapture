@@ -176,6 +176,10 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      <footer style={footerStyle}>
+        © 2026 flowlog.dev. All rights reserved.
+      </footer>
     </main>
   );
 }
@@ -214,4 +218,11 @@ const secondaryLargeLinkStyle: React.CSSProperties = {
   fontWeight: 800,
   padding: "10px 18px",
   borderRadius: 7,
+};
+
+const footerStyle: React.CSSProperties = {
+  padding: "0 24px 34px",
+  textAlign: "center",
+  color: "#94a3b8",
+  fontSize: 13,
 };

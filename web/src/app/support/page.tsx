@@ -152,6 +152,10 @@ export default function SupportPage() {
         </div>
         )}
       </section>
+
+      <footer style={footerStyle}>
+        © 2026 flowlog.dev. All rights reserved.
+      </footer>
     </main>
   );
 }
@@ -324,4 +328,11 @@ const progressFillStyle: CSSProperties = {
   height: "100%",
   background: "#22c55e",
   borderRadius: 999,
+};
+
+const footerStyle: CSSProperties = {
+  padding: "0 24px 34px",
+  textAlign: "center",
+  color: "#94a3b8",
+  fontSize: 13,
 };

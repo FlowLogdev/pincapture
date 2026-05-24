@@ -139,7 +139,7 @@ export default function PrivacyPage() {
             workspace needs them. Users can move guides to Trash, recover them,
             archive them, or mark them for deletion from the dashboard. To
             request deletion of account data, saved guide data, or support
-            ticket data, contact support@flowlog.dev.
+            ticket data, contact fabio.almeida@pinvestcapital.com.
           </PolicySection>
 
           <PolicySection title="Children">
@@ -156,7 +156,7 @@ export default function PrivacyPage() {
 
           <PolicySection title="Contact">
             For privacy questions, data deletion requests, or Chrome Web Store
-            privacy review questions, contact support@flowlog.dev.
+            privacy review questions, contact fabio.almeida@pinvestcapital.com.
           </PolicySection>
 
           <p style={{ margin: "28px 0 0", color: "#94a3b8", fontSize: 13 }}>
@@ -164,6 +164,10 @@ export default function PrivacyPage() {
           </p>
         </div>
       </section>
+
+      <footer style={footerStyle}>
+        © 2026 flowlog.dev. All rights reserved.
+      </footer>
     </main>
   );
 }
@@ -235,4 +239,11 @@ const panelStyle = {
   borderRadius: 8,
   padding: 28,
   boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+};
+
+const footerStyle = {
+  padding: "0 24px 34px",
+  textAlign: "center" as const,
+  color: "#94a3b8",
+  fontSize: 13,
 };
