@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+web/node_modules/
+
+# Next.js
+.next/
+web/.next/
+out/
+web/out/
+
+# Local environment and secrets
+.env
+.env.*
+web/.env
+web/.env.*
+!web/.env.example
+
+# Vercel local project metadata
+.vercel/
+web/.vercel/
+
+# Logs
+*.log
+web/*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Old Chrome Web Store packages
+pincapture-chrome-extension-v1.0.0.zip
