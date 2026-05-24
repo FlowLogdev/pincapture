@@ -9,12 +9,14 @@ export default function PrivacyPage() {
       fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     }}>
       <header style={{
-        height: 64,
+        minHeight: 64,
         background: "#023465",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        gap: 12,
         padding: "0 28px",
+        flexWrap: "wrap",
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <img
@@ -34,104 +36,131 @@ export default function PrivacyPage() {
           </span>
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/support" style={{
-            color: "rgba(255,255,255,0.78)",
-            textDecoration: "none",
-            fontSize: 13,
-            fontWeight: 700,
-            padding: "8px 12px",
-          }}>
-            Support
-          </Link>
-          <Link href="/login" style={{
-            color: "#023465",
-            background: "#ffdd00",
-            textDecoration: "none",
-            fontSize: 13,
-            fontWeight: 800,
-            padding: "9px 14px",
-            borderRadius: 7,
-          }}>
-            Sign in
-          </Link>
+          <Link href="/support" style={headerLinkStyle}>Support</Link>
+          <Link href="/login" style={primaryHeaderLinkStyle}>Sign in</Link>
         </nav>
       </header>
 
       <section style={{
-        maxWidth: 820,
+        maxWidth: 920,
         margin: "0 auto",
         padding: "58px 24px 76px",
       }}>
-        <p style={{
-          margin: "0 0 8px",
-          color: "#64748b",
-          fontSize: 12,
-          fontWeight: 800,
-          textTransform: "uppercase",
-          letterSpacing: 0,
-        }}>
-          Privacy Policy
+        <p style={eyebrowStyle}>Privacy Policy</p>
+        <h1 style={titleStyle}>PinCapture Privacy Policy</h1>
+        <p style={introStyle}>
+          This privacy policy applies to the PinCapture Chrome extension and
+          PinCapture web dashboard at pincapture.flowlog.dev.
         </p>
-        <h1 style={{
-          margin: "0 0 18px",
-          color: "#023465",
-          fontSize: 36,
-          lineHeight: 1.15,
-          letterSpacing: 0,
-        }}>
-          PinCapture Privacy Policy
-        </h1>
 
-        <div style={{
-          background: "#fff",
-          border: "1px solid #dbe3ef",
-          borderRadius: 8,
-          padding: 28,
-          boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
-        }}>
-          <PolicySection title="What PinCapture does">
-            PinCapture helps users create internal step-by-step process guides.
-            The Chrome extension captures screenshots and step details only after
-            a user explicitly starts recording.
+        <div style={panelStyle}>
+          <PolicySection title="Single purpose">
+            PinCapture is an internal documentation tool that lets authorized
+            users capture screenshots and step details, save them as process
+            guides, and export those guides as PDF, Word, and PowerPoint files.
+            PinCapture only captures content after the user intentionally starts
+            a capture session.
           </PolicySection>
 
-          <PolicySection title="Information PinCapture collects">
-            PinCapture collects website content only when an authorized user
-            explicitly starts a capture session and saves the resulting guide.
-            This may include screenshots, page URLs, click labels, and step
-            metadata needed to create process documentation.
+          <PolicySection title="Data categories handled">
+            PinCapture handles website content only when a user starts capture
+            and saves or exports a guide. This can include screenshots, visible
+            page text shown in screenshots, page URLs, clicked element labels,
+            slide numbers, guide titles, timestamps, and step metadata needed to
+            create the guide.
           </PolicySection>
 
-          <PolicySection title="Information we do not collect">
-            We do not collect browsing history outside active capture sessions,
-            monitor unrelated web activity, collect keystrokes, collect passwords,
-            sell data, or use captured information for advertising or profiling.
+          <PolicySection title="Account and support information">
+            PinCapture may process account information needed to sign in and use
+            the dashboard, such as email address and display name. If a user
+            submits a support ticket, PinCapture stores the requester name,
+            email address, subject, support details, ticket status, and support
+            replies so the support team can respond.
           </PolicySection>
 
-          <PolicySection title="Captured content">
-            Screenshots, click labels, page URLs, and step metadata are captured
-            only during an active capture session. That content remains local to
-            the extension until the user chooses to save it to the PinCapture
-            dashboard or export it.
+          <PolicySection title="Data we do not collect">
+            PinCapture does not collect passwords, payment card data, health
+            information, financial account information, authentication secrets,
+            precise location, unrelated browsing history, or keystroke logs.
+            PinCapture does not monitor websites outside an active capture
+            session.
           </PolicySection>
 
-          <PolicySection title="How saved guides are used">
-            Saved guides are stored in the user&apos;s PinCapture workspace so the
-            user and authorized internal team members can view, edit, and export them.
-            PinCapture does not use saved guide content for advertising.
+          <PolicySection title="How data is used">
+            Captured content is used only to create, display, save, edit, export,
+            and support PinCapture process guides. Account and support data is
+            used only to authenticate users, operate the dashboard, provide
+            support, and maintain service security.
           </PolicySection>
 
-          <PolicySection title="Data sharing">
-            We do not sell, rent, or transfer captured guide content to third
-            parties for marketing, advertising, or profiling purposes.
+          <PolicySection title="Chrome extension permissions">
+            PinCapture requests permissions only to support its documentation
+            workflow. activeTab, tabs, scripting, and host access are used to
+            capture the current page after the user starts capture. storage is
+            used to keep the in-progress capture and extension settings.
+            downloads is used when the user exports a guide file. sidePanel is
+            used to keep the capture controls and slide list visible on the
+            right side of Chrome.
+          </PolicySection>
+
+          <PolicySection title="Local capture and saving">
+            During a capture session, screenshots and step data remain in the
+            browser extension until the user chooses to save the guide to the
+            PinCapture dashboard or export a file. If the user clears the
+            capture or removes the extension, unsaved local capture data may be
+            deleted.
+          </PolicySection>
+
+          <PolicySection title="Sharing and transfer">
+            PinCapture does not sell, rent, or transfer user data to third
+            parties for advertising, marketing, profiling, analytics resale, or
+            unrelated purposes. Saved guide content is available only to the
+            authenticated user and authorized internal administrators needed to
+            operate or support the service.
+          </PolicySection>
+
+          <PolicySection title="Limited Use disclosure">
+            PinCapture&apos;s use and transfer of information received from
+            Google APIs will adhere to the Chrome Web Store User Data Policy,
+            including the Limited Use requirements. PinCapture does not use or
+            transfer user data for purposes unrelated to its single purpose and
+            does not use user data to determine creditworthiness or lending
+            eligibility.
+          </PolicySection>
+
+          <PolicySection title="Security">
+            PinCapture uses HTTPS for the public web dashboard and Chrome
+            extension service endpoints. Access to saved guides and tickets is
+            limited through authenticated sessions and database access controls.
+          </PolicySection>
+
+          <PolicySection title="Retention and deletion">
+            Saved guides and support tickets are retained while the account or
+            workspace needs them. Users can move guides to Trash, recover them,
+            archive them, or mark them for deletion from the dashboard. To
+            request deletion of account data, saved guide data, or support
+            ticket data, contact support@flowlog.dev.
+          </PolicySection>
+
+          <PolicySection title="Children">
+            PinCapture is intended for business and internal team use. It is not
+            directed to children under 13, and we do not knowingly collect data
+            from children under 13.
+          </PolicySection>
+
+          <PolicySection title="Changes">
+            We may update this policy when PinCapture changes or when legal,
+            security, or Chrome Web Store requirements change. The effective date
+            below shows when this policy was last updated.
           </PolicySection>
 
           <PolicySection title="Contact">
-            For privacy questions about PinCapture, contact support@flowlog.dev.
+            For privacy questions, data deletion requests, or Chrome Web Store
+            privacy review questions, contact support@flowlog.dev.
           </PolicySection>
 
           <p style={{ margin: "28px 0 0", color: "#94a3b8", fontSize: 13 }}>
-            Last updated: May 24, 2026
+            Effective date: May 24, 2026
           </p>
         </div>
       </section>
@@ -157,3 +186,53 @@ function PolicySection({
     </section>
   );
 }
+
+const headerLinkStyle = {
+  color: "rgba(255,255,255,0.78)",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 700,
+  padding: "8px 12px",
+};
+
+const primaryHeaderLinkStyle = {
+  color: "#023465",
+  background: "#ffdd00",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 800,
+  padding: "9px 14px",
+  borderRadius: 7,
+};
+
+const eyebrowStyle = {
+  margin: "0 0 8px",
+  color: "#64748b",
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase" as const,
+  letterSpacing: 0,
+};
+
+const titleStyle = {
+  margin: "0 0 18px",
+  color: "#023465",
+  fontSize: 36,
+  lineHeight: 1.15,
+  letterSpacing: 0,
+};
+
+const introStyle = {
+  margin: "0 0 24px",
+  color: "#475569",
+  lineHeight: 1.7,
+  fontSize: 16,
+};
+
+const panelStyle = {
+  background: "#fff",
+  border: "1px solid #dbe3ef",
+  borderRadius: 8,
+  padding: 28,
+  boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+};
