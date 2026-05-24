@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   return (
@@ -14,6 +15,8 @@ export default function LoginPage() {
 
 function LoginForm() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"magic" | "password">("magic");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -30,9 +33,37 @@ function LoginForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
+    if (mode === "password" && !password) return;
 
     setLoading(true);
     setError("");
+
+    if (mode === "password") {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      setLoading(false);
+
+      if (error || !data.user) {
+        setError(error?.message || "Could not sign in. Check the email and password.");
+        return;
+      }
+
+      await fetch("/api/auth/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: data.user.id,
+          email: data.user.email,
+          fullName: data.user.user_metadata?.full_name || "",
+        }),
+      });
+
+      router.push("/dashboard");
+      return;
+    }
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -109,8 +140,25 @@ function LoginForm() {
                 Sign in to PinCapture
               </h1>
               <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
-                We'll send a sign-in link to your email
+                {mode === "magic" ? "We'll send a sign-in link to your email" : "Use your approved demo password"}
               </p>
+            </div>
+
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 6,
+              background: "#f1f5f9",
+              borderRadius: 8,
+              padding: 4,
+              marginBottom: 18,
+            }}>
+              <button type="button" onClick={() => setMode("magic")} style={modeButtonStyle(mode === "magic")}>
+                Magic link
+              </button>
+              <button type="button" onClick={() => setMode("password")} style={modeButtonStyle(mode === "password")}>
+                Password
+              </button>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -139,6 +187,32 @@ function LoginForm() {
                 />
               </div>
 
+              {mode === "password" && (
+                <div style={{ marginBottom: 22 }}>
+                  <label style={{
+                    display: "block", fontSize: 13, fontWeight: 600,
+                    color: "#374151", marginBottom: 6,
+                  }}>
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    required
+                    style={{
+                      width: "100%", padding: "10px 13px",
+                      borderRadius: 8, border: "1px solid #d1d5db",
+                      fontSize: 14, outline: "none", boxSizing: "border-box",
+                      fontFamily: "system-ui",
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = "#023465")}
+                    onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+                  />
+                </div>
+              )}
+
               {error && (
                 <div style={{
                   background: "#fef2f2", border: "1px solid #fca5a5",
@@ -162,7 +236,7 @@ function LoginForm() {
                   fontFamily: "system-ui", transition: "background 0.15s",
                 }}
               >
-                {loading ? "Sending link…" : "Send sign-in link →"}
+                {loading ? (mode === "password" ? "Signing in..." : "Sending link...") : (mode === "password" ? "Sign in" : "Send sign-in link ->")}
               </button>
             </form>
 
@@ -181,4 +255,17 @@ function LoginForm() {
       </p>
     </div>
   );
+}
+
+function modeButtonStyle(active: boolean): React.CSSProperties {
+  return {
+    border: 0,
+    borderRadius: 6,
+    padding: "8px 10px",
+    background: active ? "#023465" : "transparent",
+    color: active ? "#fff" : "#023465",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+  };
 }
