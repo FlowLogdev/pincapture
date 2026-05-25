@@ -39,29 +39,21 @@ function LoginForm() {
     setError("");
 
     if (mode === "password") {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const res = await fetch("/api/auth/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
       });
+      const data = await res.json();
 
       setLoading(false);
 
-      if (error || !data.user) {
-        setError(error?.message || "Could not sign in. Check the email and password.");
+      if (!res.ok) {
+        setError(data.error || "Could not sign in. Check the email and password.");
         return;
       }
 
-      await fetch("/api/auth/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: data.user.id,
-          email: data.user.email,
-          fullName: data.user.user_metadata?.full_name || "",
-        }),
-      });
-
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
       return;
     }
 
