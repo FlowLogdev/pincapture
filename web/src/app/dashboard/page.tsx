@@ -37,7 +37,7 @@ const viewLabels: Record<ViewMode, string> = {
   trashed: "Trash",
   deleted: "Deleted Records",
   tickets: "Tickets",
-  adminTickets: "Admin Tickets",
+  adminTickets: "All Customer Tickets",
 };
 
 const ticketLabels: Record<TicketStatus, string> = {
@@ -71,11 +71,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (view === "tickets" || view === "adminTickets") {
-      loadTickets(view === "adminTickets" ? "all" : "mine");
+      loadTickets(isAdmin || view === "adminTickets" ? "all" : "mine");
     } else {
       loadGuides(view);
     }
-  }, [view]);
+  }, [view, isAdmin]);
 
   async function loadUser() {
     const { data: { user } } = await supabase.auth.getUser();

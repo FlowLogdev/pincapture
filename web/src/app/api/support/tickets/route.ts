@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
   const rows = (data ?? [])
     .map((row: any) => ({ row, ticket: parseTicket(row.description) }))
     .filter((item: any) => item.ticket)
-    .filter((item: any) => admin && scope === "all"
+    .filter((item: any) => admin
       ? true
       : item.ticket.requesterEmail.toLowerCase() === requesterEmail);
 
@@ -104,6 +104,12 @@ export async function GET(req: NextRequest) {
     }
     return { id: row.id, ...normalized };
   }));
+
+  tickets.sort((a, b) => {
+    if (a.status === "closed" && b.status !== "closed") return 1;
+    if (a.status !== "closed" && b.status === "closed") return -1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
 
   return NextResponse.json({ tickets, isAdmin: admin });
 }
