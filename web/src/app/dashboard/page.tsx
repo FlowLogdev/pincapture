@@ -55,6 +55,7 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [greeting, setGreeting] = useState("");
   const [error, setError] = useState("");
   const [view, setView] = useState<ViewMode>("active");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -65,6 +66,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadUser();
+    setGreeting(getGreeting());
   }, []);
 
   useEffect(() => {
@@ -165,8 +167,9 @@ export default function DashboardPage() {
   }
 
   async function signOut() {
+    await fetch("/api/auth/signout", { method: "POST" });
     await supabase.auth.signOut();
-    window.location.href = "/";
+    window.location.href = "/login";
   }
 
   const groupedGuides = useMemo(() => {
@@ -190,7 +193,11 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {userName && <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>{userName}</span>}
+          {userEmail && (
+            <span style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, fontWeight: 700 }}>
+              {greeting}, {firstNameFromUser(userName, userEmail)}
+            </span>
+          )}
           <Link href="/docs" style={docsButtonStyle}>DOCS</Link>
           <button onClick={createGuide} disabled={creating} style={newGuideStyle}>
             {creating ? "Creating..." : "+ New guide"}
@@ -461,6 +468,19 @@ function formatRecordedAt(value?: string) {
 function monthLabel(value?: string | null) {
   if (!value || value === "Unsorted") return "Unsorted";
   return new Date(`${value}-01T00:00:00`).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 18) return "Good Afternoon";
+  return "Good Evening";
+}
+
+function firstNameFromUser(name: string, email: string) {
+  const source = name?.trim() || email.split("@")[0] || "there";
+  const first = source.split(/[.\s_-]+/).filter(Boolean)[0] || source;
+  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
 const headerStyle: CSSProperties = {
