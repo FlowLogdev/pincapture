@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { getPublicAppUrl } from "@/lib/app-url";
 
 export async function GET(req: NextRequest) {
-  const { searchParams, origin } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
   const action = searchParams.get("action");
 
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   );
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003";
+  const appUrl = getPublicAppUrl();
 
   const { data: pending, error: lookupError } = await supabaseAdmin
     .from("pending_registrations")
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
     return htmlResponse("Error", "Could not generate sign-in link. Please try again.", false);
   }
 
-  const magicLink = data.properties.action_link;
+  const magicLink = buildMagicLink(appUrl, data.properties);
   const firstName = pending.full_name.split(" ")[0];
 
   const { error: emailError } = await resend.emails.send({
@@ -175,4 +176,12 @@ function buildWelcomeEmail(firstName: string, link: string): string {
   </table>
 </body>
 </html>`;
+}
+
+function buildMagicLink(appUrl: string, properties: { action_link?: string; hashed_token?: string }) {
+  if (properties.hashed_token) {
+    return `${appUrl}/auth/callback-client?token_hash=${encodeURIComponent(properties.hashed_token)}&type=magiclink`;
+  }
+
+  return properties.action_link || `${appUrl}/login`;
 }

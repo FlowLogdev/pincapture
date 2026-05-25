@@ -38,6 +38,24 @@ export default function AuthCallbackPage() {
         }
       }
 
+      const queryParams = new URLSearchParams(window.location.search);
+      const tokenHash = queryParams.get("token_hash");
+      const type = queryParams.get("type") || "magiclink";
+
+      if (tokenHash) {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type as "magiclink",
+        });
+
+        if (!error && data.session) {
+          window.history.replaceState(null, "", window.location.pathname);
+          await createProfile(data.session);
+          router.replace("/dashboard");
+          return;
+        }
+      }
+
       const hashParams = new URLSearchParams(window.location.hash.slice(1));
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");

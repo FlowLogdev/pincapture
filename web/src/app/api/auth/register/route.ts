@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { getPublicAppUrl } from "@/lib/app-url";
 
 export async function POST(req: NextRequest) {
   const { email, fullName } = await req.json();
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
   );
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003";
+  const appUrl = getPublicAppUrl();
 
   // Check if already a registered user
   const { data: existingUser } = await supabaseAdmin

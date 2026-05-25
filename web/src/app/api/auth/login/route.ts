@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { getPublicAppUrl } from "@/lib/app-url";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3003";
+  const appUrl = getPublicAppUrl();
 
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({
     type: "magiclink",
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  const magicLink = data.properties.action_link;
+  const magicLink = buildMagicLink(appUrl, data.properties);
 
   const { error: emailError } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
@@ -105,4 +106,12 @@ function buildEmail(link: string): string {
   </table>
 </body>
 </html>`;
+}
+
+function buildMagicLink(appUrl: string, properties: { action_link?: string; hashed_token?: string }) {
+  if (properties.hashed_token) {
+    return `${appUrl}/auth/callback-client?token_hash=${encodeURIComponent(properties.hashed_token)}&type=magiclink`;
+  }
+
+  return properties.action_link || `${appUrl}/login`;
 }
