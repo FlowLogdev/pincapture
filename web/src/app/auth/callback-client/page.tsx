@@ -40,12 +40,12 @@ export default function AuthCallbackPage() {
 
       const queryParams = new URLSearchParams(window.location.search);
       const tokenHash = queryParams.get("token_hash");
-      const type = queryParams.get("type") || "magiclink";
+      const type = queryParams.get("type") || "email";
 
       if (tokenHash) {
         const { data, error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: type as "magiclink",
+          type: type as "email",
         });
 
         if (!error && data.session) {

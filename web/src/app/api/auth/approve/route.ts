@@ -180,7 +180,7 @@ function buildWelcomeEmail(firstName: string, link: string): string {
 
 function buildMagicLink(appUrl: string, properties: { action_link?: string; hashed_token?: string }) {
   if (properties.hashed_token) {
-    return `${appUrl}/auth/callback-client?token_hash=${encodeURIComponent(properties.hashed_token)}&type=magiclink`;
+    return `${appUrl}/auth/callback-client?token_hash=${encodeURIComponent(properties.hashed_token)}&type=email`;
   }
 
   return properties.action_link || `${appUrl}/login`;
