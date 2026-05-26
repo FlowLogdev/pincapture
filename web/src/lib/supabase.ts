@@ -14,6 +14,8 @@ export type Guide = {
   is_public: boolean;
   share_token: string;
   step_count?: number;
+  has_video?: boolean;
+  video_count?: number;
   last_recorded_at?: string;
   archived_at?: string | null;
   trashed_at?: string | null;

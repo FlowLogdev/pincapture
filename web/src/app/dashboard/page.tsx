@@ -4,7 +4,7 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link";
 import { supabase, type Guide } from "@/lib/supabase";
 
-type GuideViewMode = "active" | "archived" | "trashed" | "deleted";
+type GuideViewMode = "active" | "videos" | "archived" | "trashed" | "deleted";
 type ViewMode = GuideViewMode | "tickets" | "adminTickets";
 type TicketStatus = "submitted" | "review" | "working" | "updated" | "closed";
 type CaptureMode = "screenshots" | "video";
@@ -34,6 +34,7 @@ const adminEmails = ["support@flowlog.dev", "fabio.almeida@pinvestcapital.com"];
 
 const viewLabels: Record<ViewMode, string> = {
   active: "Dashboard",
+  videos: "Saved Videos",
   archived: "Archive Folder",
   trashed: "Trash",
   deleted: "Deleted Records",
@@ -183,7 +184,7 @@ export default function DashboardPage() {
     }, {});
   }, [guides]);
 
-  const visibleTabs = (["active", "archived", "trashed", "deleted", "tickets"] as ViewMode[])
+  const visibleTabs = (["active", "videos", "archived", "trashed", "deleted", "tickets"] as ViewMode[])
     .concat(isAdmin ? ["adminTickets"] : []);
 
   return (
@@ -248,13 +249,13 @@ export default function DashboardPage() {
           <EmptyState view={view} onCreate={createGuide} />
         )}
 
-        {view === "active" && guides.length > 0 && (
+        {(view === "active" || view === "videos") && guides.length > 0 && (
           <div style={gridStyle}>
             {guides.map((guide) => (
               <GuideCard
                 key={guide.id}
                 guide={guide}
-                view={view}
+                view={view === "videos" ? "active" : view}
                 menuOpen={openMenuId === guide.id}
                 onMenu={() => setOpenMenuId(openMenuId === guide.id ? null : guide.id)}
                 onAction={updateGuide}
@@ -263,7 +264,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {view !== "active" && view !== "tickets" && view !== "adminTickets" && Object.entries(groupedGuides).map(([month, monthGuides]) => (
+        {view !== "active" && view !== "videos" && view !== "tickets" && view !== "adminTickets" && Object.entries(groupedGuides).map(([month, monthGuides]) => (
           <section key={month} style={{ marginBottom: 30 }}>
             <h2 style={{ color: "#023465", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
               {monthLabel(month)}
@@ -683,9 +684,18 @@ function GuideCard({
         </div>
       )}
 
-      <div style={cardThumbStyle}>Guide</div>
+      <div style={guide.has_video ? videoCardThumbStyle : cardThumbStyle}>
+        {guide.has_video ? "Video" : "Guide"}
+      </div>
       <div style={{ padding: "12px 16px", flex: 1 }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6, color: "#023465" }}>{guide.title}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: "#023465" }}>{guide.title}</div>
+          {guide.has_video && (
+            <span style={videoPillStyle}>
+              {guide.video_count || 1} video{(guide.video_count || 1) !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
         <div style={{ color: "#475569", fontSize: 13, lineHeight: 1.55 }}>
           {guide.step_count} step{guide.step_count !== 1 ? "s" : ""}
           <br />
@@ -702,6 +712,7 @@ function GuideCard({
 function EmptyState({ view, onCreate }: { view: GuideViewMode; onCreate: () => void }) {
   const text: Record<GuideViewMode, string> = {
     active: "No guides yet.",
+    videos: "No saved videos yet.",
     archived: "No archived guides yet.",
     trashed: "Trash is empty.",
     deleted: "No deleted records yet.",
@@ -1197,6 +1208,22 @@ const cardThumbStyle: CSSProperties = {
   color: "#023465",
   fontSize: 15,
   fontWeight: 800,
+};
+
+const videoCardThumbStyle: CSSProperties = {
+  ...cardThumbStyle,
+  background: "linear-gradient(135deg, #023465 0%, #0f766e 100%)",
+  color: "#fff",
+  fontSize: 16,
+};
+
+const videoPillStyle: CSSProperties = {
+  background: "#dcfce7",
+  color: "#166534",
+  borderRadius: 999,
+  padding: "3px 8px",
+  fontSize: 11,
+  fontWeight: 900,
 };
 
 const openButtonStyle: CSSProperties = {

@@ -5,17 +5,18 @@ const LEGACY_ARCHIVE_PREFIX = "[PinCapture archived at ";
 const STATUS_RE = /^\[PinCapture status=(archived|trashed|deleted) at ([^\]]+)\]\n?/;
 const TICKET_PREFIX = "[PinCapture ticket]\n";
 
-type GuideStatus = "active" | "archived" | "trashed" | "deleted";
+type GuideStateStatus = "active" | "archived" | "trashed" | "deleted";
+type GuideStatus = GuideStateStatus | "videos";
 
 function readState(description?: string | null): {
-  status: GuideStatus;
+  status: GuideStateStatus;
   archivedAt: string | null;
   trashedAt: string | null;
   deletedAt: string | null;
 } {
   const statusMatch = description?.match(STATUS_RE);
   if (statusMatch) {
-    const status = statusMatch[1] as Exclude<GuideStatus, "active">;
+    const status = statusMatch[1] as Exclude<GuideStateStatus, "active">;
     const date = statusMatch[2];
     return {
       status,
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("guides")
-    .select("*, steps(id, created_at)")
+    .select("*, steps(id, created_at, type, screenshot_url, annotated_screenshot_url)")
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -70,17 +71,27 @@ export async function GET(req: NextRequest) {
 
   const requested = req.nextUrl.searchParams.get("status");
   const status: GuideStatus =
-    requested === "archived" || requested === "trashed" || requested === "deleted"
+    requested === "archived" || requested === "trashed" || requested === "deleted" || requested === "videos"
       ? requested
       : "active";
 
   const guides = (data ?? [])
     .filter((guide: any) => !guide.description?.startsWith(TICKET_PREFIX))
     .map((guide: any) => {
-      const stepDates = (guide.steps ?? [])
+      const steps = guide.steps ?? [];
+      const stepDates = steps
         .map((step: { created_at?: string }) => step.created_at)
         .filter(Boolean)
         .sort();
+      const videoSteps = steps.filter((step: { type?: string; screenshot_url?: string | null; annotated_screenshot_url?: string | null }) => {
+        const screenshotUrl = step.screenshot_url || "";
+        const annotatedUrl = step.annotated_screenshot_url || "";
+        return step.type === "video"
+          || screenshotUrl.startsWith("data:video/")
+          || annotatedUrl.startsWith("data:video/")
+          || screenshotUrl.includes(".webm")
+          || annotatedUrl.includes(".webm");
+      });
       const lastRecordedAt = stepDates.at(-1) || guide.created_at || guide.updated_at;
       const state = readState(guide.description);
       const stateDate = state.archivedAt || state.trashedAt || state.deletedAt || lastRecordedAt;
@@ -88,7 +99,9 @@ export async function GET(req: NextRequest) {
       return {
         ...guide,
         steps: undefined,
-        step_count: guide.steps?.length ?? 0,
+        step_count: steps.length,
+        has_video: videoSteps.length > 0,
+        video_count: videoSteps.length,
         last_recorded_at: lastRecordedAt,
         archived_at: state.archivedAt,
         trashed_at: state.trashedAt,
@@ -98,7 +111,9 @@ export async function GET(req: NextRequest) {
         state_status: state.status,
       };
     })
-    .filter((guide: any) => guide.state_status === status)
+    .filter((guide: any) => status === "videos"
+      ? guide.state_status === "active" && guide.has_video
+      : guide.state_status === status)
     .sort((a: any, b: any) => {
       const aTime = new Date(a.last_recorded_at || a.updated_at).getTime();
       const bTime = new Date(b.last_recorded_at || b.updated_at).getTime();
