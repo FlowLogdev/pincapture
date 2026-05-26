@@ -8,6 +8,7 @@ type ImportStep = {
   type?: string;
   screenshotDataUrl?: string;
   annotatedScreenshotDataUrl?: string;
+  videoDataUrl?: string;
   annotationRect?: object | null;
   clickX?: number | null;
   clickY?: number | null;
@@ -60,8 +61,8 @@ export async function POST(req: NextRequest) {
     title: step.title || `Step ${index + 1}`,
     description: step.description || "",
     type: step.type || "click",
-    screenshot_url: step.screenshotDataUrl || null,
-    annotated_screenshot_url: step.annotatedScreenshotDataUrl || null,
+    screenshot_url: step.screenshotDataUrl || step.videoDataUrl || null,
+    annotated_screenshot_url: step.annotatedScreenshotDataUrl || step.screenshotDataUrl || step.videoDataUrl || null,
     annotation_rect: step.annotationRect || null,
     click_x: step.clickX ?? null,
     click_y: step.clickY ?? null,

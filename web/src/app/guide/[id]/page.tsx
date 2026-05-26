@@ -254,7 +254,17 @@ export default function GuidePage({ params }: { params: Params }) {
             >
               {/* Thumbnail */}
               <div style={{ flexShrink: 0 }}>
-                {step.annotated_screenshot_url || step.screenshot_url ? (
+                {step.type === "video" ? (
+                  <div
+                    style={{
+                      width: 52, height: 34, borderRadius: 4, border: "1px solid #e2e5ef",
+                      background: "#023465", display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: 10, fontWeight: 700,
+                    }}
+                  >
+                    video
+                  </div>
+                ) : step.annotated_screenshot_url || step.screenshot_url ? (
                   <img
                     src={step.annotated_screenshot_url || step.screenshot_url!}
                     alt=""
@@ -341,7 +351,8 @@ function StepEditor({
     setTitleDraft(step.title);
   }, [step.id]);
 
-  const imgSrc = step.annotated_screenshot_url || step.screenshot_url;
+  const mediaSrc = step.annotated_screenshot_url || step.screenshot_url;
+  const isVideo = step.type === "video" || mediaSrc?.startsWith("data:video/");
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto" }}>
@@ -389,10 +400,20 @@ function StepEditor({
         <p style={{ color: "#6b7280", fontSize: 13, marginBottom: 16 }}>{step.description}</p>
       )}
 
-      {/* Screenshot */}
-      {imgSrc ? (
+      {/* Media */}
+      {isVideo && mediaSrc ? (
+        <video
+          src={mediaSrc}
+          controls
+          style={{
+            width: "100%", borderRadius: 10, border: "1px solid #e2e5ef",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            background: "#000",
+          }}
+        />
+      ) : mediaSrc ? (
         <img
-          src={imgSrc}
+          src={mediaSrc}
           alt={`Step ${step.step_number}`}
           style={{
             width: "100%", borderRadius: 10, border: "1px solid #e2e5ef",

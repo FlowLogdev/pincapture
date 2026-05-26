@@ -28,7 +28,7 @@ export type Step = {
   step_number: number;
   title: string;
   description: string | null;
-  type: "click" | "type" | "navigate" | "select";
+  type: "click" | "type" | "navigate" | "select" | "screenshot" | "video";
   screenshot_url: string | null;
   annotated_screenshot_url: string | null;
   annotation_rect: { x: number; y: number; w: number; h: number } | null;

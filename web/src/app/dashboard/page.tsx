@@ -1,12 +1,13 @@
 "use client";
 
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase, type Guide } from "@/lib/supabase";
 
 type GuideViewMode = "active" | "archived" | "trashed" | "deleted";
 type ViewMode = GuideViewMode | "tickets" | "adminTickets";
 type TicketStatus = "submitted" | "review" | "working" | "updated" | "closed";
+type CaptureMode = "screenshots" | "video";
 
 type TicketMessage = {
   author: "customer" | "admin" | "system";
@@ -61,6 +62,7 @@ export default function DashboardPage() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [ticketDrafts, setTicketDrafts] = useState<Record<string, string>>({});
   const [ticketStatuses, setTicketStatuses] = useState<Record<string, TicketStatus>>({});
+  const [captureMode, setCaptureMode] = useState<CaptureMode | null>(null);
 
   const isAdmin = adminEmails.includes(userEmail.toLowerCase());
 
@@ -209,12 +211,20 @@ export default function DashboardPage() {
       <main style={{ maxWidth: 1120, margin: "0 auto", padding: "36px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 22, flexWrap: "wrap" }}>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#023465" }}>{viewLabels[view]}</h1>
-          <div style={tabsStyle}>
-            {visibleTabs.map((mode) => (
-              <button key={mode} onClick={() => setView(mode)} style={tabButtonStyle(view === mode)}>
-                {viewLabels[mode]}
-              </button>
-            ))}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <button onClick={() => setCaptureMode("screenshots")} style={captureActionStyle}>
+              Capture screenshot
+            </button>
+            <button onClick={() => setCaptureMode("video")} style={captureSecondaryActionStyle}>
+              Capture a video
+            </button>
+            <div style={tabsStyle}>
+              {visibleTabs.map((mode) => (
+                <button key={mode} onClick={() => setView(mode)} style={tabButtonStyle(view === mode)}>
+                  {viewLabels[mode]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -273,7 +283,255 @@ export default function DashboardPage() {
           </section>
         ))}
       </main>
+
+      {captureMode && (
+        <DashboardCapturePanel
+          mode={captureMode}
+          onClose={() => setCaptureMode(null)}
+        />
+      )}
     </div>
+  );
+}
+
+type DashboardCaptureStep = {
+  stepNumber: number;
+  title: string;
+  description: string;
+  type: "screenshot" | "video";
+  screenshotDataUrl?: string;
+  annotatedScreenshotDataUrl?: string;
+  videoDataUrl?: string;
+  url?: string;
+};
+
+function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const [title, setTitle] = useState(mode === "video" ? "Dashboard video capture" : "Dashboard screenshot capture");
+  const [steps, setSteps] = useState<DashboardCaptureStep[]>([]);
+  const [recording, setRecording] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState("Choose a screen, window, or browser tab to begin.");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    return () => stopStream();
+  }, []);
+
+  async function startSharing() {
+    setError("");
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      setError("Screen capture is not available in this browser.");
+      return;
+    }
+
+    try {
+      stopStream();
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: mode === "video",
+      });
+      streamRef.current = stream;
+      setSharing(true);
+      setStatus(mode === "video" ? "Ready to record video." : "Ready to capture screenshots.");
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      stream.getVideoTracks()[0]?.addEventListener("ended", () => {
+        setSharing(false);
+        setRecording(false);
+        setStatus("Screen sharing stopped.");
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start screen capture.");
+    }
+  }
+
+  function stopStream() {
+    recorderRef.current?.state === "recording" && recorderRef.current.stop();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setSharing(false);
+    setRecording(false);
+  }
+
+  function captureScreenshot() {
+    const video = videoRef.current;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      setError("Start screen sharing before capturing a screenshot.");
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL("image/png");
+    const stepNumber = steps.length + 1;
+    setSteps((prev) => [
+      ...prev,
+      {
+        stepNumber,
+        title: `Screenshot ${stepNumber}`,
+        description: `Captured from dashboard screen share`,
+        type: "screenshot",
+        screenshotDataUrl: dataUrl,
+        annotatedScreenshotDataUrl: dataUrl,
+        url: window.location.href,
+      },
+    ]);
+    setStatus(`Captured screenshot ${stepNumber}.`);
+    setError("");
+  }
+
+  function startVideoRecording() {
+    const stream = streamRef.current;
+    if (!stream) {
+      setError("Start screen sharing before recording video.");
+      return;
+    }
+
+    chunksRef.current = [];
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : "video/webm";
+    const recorder = new MediaRecorder(stream, { mimeType });
+    recorderRef.current = recorder;
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) chunksRef.current.push(event.data);
+    };
+    recorder.onstop = async () => {
+      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      const dataUrl = await blobToDataUrl(blob);
+      setSteps([{
+        stepNumber: 1,
+        title: title.trim() || "Dashboard video capture",
+        description: "Recorded from dashboard screen share",
+        type: "video",
+        videoDataUrl: dataUrl,
+        url: window.location.href,
+      }]);
+      setRecording(false);
+      setStatus("Video recording stopped and is ready to save.");
+    };
+    recorder.start(1000);
+    setRecording(true);
+    setStatus("Recording video...");
+    setError("");
+  }
+
+  function stopVideoRecording() {
+    if (recorderRef.current?.state === "recording") {
+      recorderRef.current.stop();
+    }
+  }
+
+  async function saveCapture() {
+    if (!steps.length) {
+      setError(mode === "video" ? "Record a video before saving." : "Capture at least one screenshot before saving.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/guides/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title.trim() || "Untitled Guide", steps }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not save capture.");
+      stopStream();
+      window.location.href = `/guide/${data.guide.id}`;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save capture.");
+      setSaving(false);
+    }
+  }
+
+  return (
+    <aside style={capturePanelStyle}>
+      <div style={capturePanelHeaderStyle}>
+        <div>
+          <div style={{ color: "#fff", fontSize: 18, fontWeight: 900 }}>PinCapture</div>
+          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 700 }}>
+            {mode === "video" ? "Video capture" : "Screenshot capture"}
+          </div>
+        </div>
+        <button onClick={() => { stopStream(); onClose(); }} style={captureCloseStyle} aria-label="Close capture panel">x</button>
+      </div>
+
+      <div style={{ padding: 14, display: "grid", gap: 12 }}>
+        <label style={captureLabelStyle}>
+          Guide title
+          <input value={title} onChange={(event) => setTitle(event.target.value)} style={captureInputStyle} />
+        </label>
+
+        <video ref={videoRef} muted playsInline style={capturePreviewStyle} />
+
+        <button onClick={startSharing} style={capturePrimaryButtonStyle}>
+          {sharing ? "Change screen source" : "Choose screen to capture"}
+        </button>
+
+        {mode === "screenshots" ? (
+          <button onClick={captureScreenshot} disabled={!sharing} style={capturePrimaryButtonStyle}>
+            Capture screenshot
+          </button>
+        ) : (
+          <button
+            onClick={recording ? stopVideoRecording : startVideoRecording}
+            disabled={!sharing}
+            style={recording ? captureDangerButtonStyle : capturePrimaryButtonStyle}
+          >
+            {recording ? "Stop video" : "Start video"}
+          </button>
+        )}
+
+        {error && <div style={captureErrorStyle}>{error}</div>}
+        <div style={captureStatusStyle}>{status}</div>
+
+        <div style={captureListHeaderStyle}>
+          <span>{mode === "video" ? "Video capture" : "Screen captures"}</span>
+          <span>{steps.length} {steps.length === 1 ? "item" : "items"}</span>
+        </div>
+
+        <div style={captureListStyle}>
+          {steps.length === 0 ? (
+            <div style={captureEmptyStyle}>
+              {mode === "video"
+                ? "Choose a screen, start video, then stop when the recording is complete."
+                : "Choose a screen, prepare the page, then click Capture screenshot for each numbered slide."}
+            </div>
+          ) : steps.map((step) => (
+            <div key={step.stepNumber} style={captureItemStyle}>
+              <div style={captureItemNumberStyle}>{step.stepNumber}</div>
+              {step.type === "video" ? (
+                <video src={step.videoDataUrl} controls style={captureThumbStyle} />
+              ) : (
+                <img src={step.screenshotDataUrl} alt={step.title} style={captureThumbStyle} />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: "#023465", fontSize: 13, fontWeight: 900 }}>{step.title}</div>
+                <div style={{ color: "#64748b", fontSize: 11 }}>{step.type}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={saveCapture} disabled={saving || !steps.length || recording} style={captureSaveButtonStyle}>
+          {saving ? "Saving..." : "Finish and save to dashboard"}
+        </button>
+      </div>
+    </aside>
   );
 }
 
@@ -483,6 +741,15 @@ function firstNameFromUser(name: string, email: string) {
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
+function blobToDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
 const headerStyle: CSSProperties = {
   background: "#023465",
   padding: "0 28px",
@@ -522,6 +789,191 @@ const newGuideStyle: CSSProperties = {
   fontWeight: 700,
   fontSize: 13,
   cursor: "pointer",
+};
+
+const captureActionStyle: CSSProperties = {
+  background: "#023465",
+  color: "#fff",
+  border: "none",
+  borderRadius: 7,
+  padding: "9px 14px",
+  fontWeight: 800,
+  fontSize: 13,
+  cursor: "pointer",
+};
+
+const captureSecondaryActionStyle: CSSProperties = {
+  background: "#fff",
+  color: "#023465",
+  border: "1px solid #cbd5e1",
+  borderRadius: 7,
+  padding: "8px 14px",
+  fontWeight: 800,
+  fontSize: 13,
+  cursor: "pointer",
+};
+
+const capturePanelStyle: CSSProperties = {
+  position: "fixed",
+  top: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 40,
+  width: "min(430px, 100vw)",
+  background: "#f8fafc",
+  borderLeft: "1px solid #cbd5e1",
+  boxShadow: "-16px 0 38px rgba(15,23,42,0.2)",
+  overflowY: "auto",
+};
+
+const capturePanelHeaderStyle: CSSProperties = {
+  background: "#023465",
+  padding: "16px 18px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+};
+
+const captureCloseStyle: CSSProperties = {
+  width: 32,
+  height: 32,
+  borderRadius: 6,
+  border: "1px solid rgba(255,255,255,0.25)",
+  background: "rgba(255,255,255,0.08)",
+  color: "#fff",
+  fontSize: 18,
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const captureLabelStyle: CSSProperties = {
+  display: "grid",
+  gap: 6,
+  color: "#023465",
+  fontSize: 12,
+  fontWeight: 900,
+};
+
+const captureInputStyle: CSSProperties = {
+  border: "1px solid #cbd5e1",
+  borderRadius: 7,
+  padding: "10px 11px",
+  color: "#0f172a",
+  font: "inherit",
+  fontSize: 14,
+};
+
+const capturePreviewStyle: CSSProperties = {
+  width: "100%",
+  aspectRatio: "16 / 10",
+  background: "#0f172a",
+  border: "1px solid #cbd5e1",
+  borderRadius: 8,
+  objectFit: "contain",
+};
+
+const capturePrimaryButtonStyle: CSSProperties = {
+  background: "#023465",
+  color: "#fff",
+  border: "none",
+  borderRadius: 7,
+  padding: "11px 14px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const captureDangerButtonStyle: CSSProperties = {
+  ...capturePrimaryButtonStyle,
+  background: "#dc2626",
+};
+
+const captureSaveButtonStyle: CSSProperties = {
+  background: "#FFDD00",
+  color: "#023465",
+  border: "none",
+  borderRadius: 7,
+  padding: "12px 14px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const captureStatusStyle: CSSProperties = {
+  background: "#eef6ff",
+  border: "1px solid #bfdbfe",
+  color: "#075985",
+  borderRadius: 7,
+  padding: "9px 10px",
+  fontSize: 12,
+  lineHeight: 1.45,
+};
+
+const captureErrorStyle: CSSProperties = {
+  background: "#fef2f2",
+  border: "1px solid #fca5a5",
+  color: "#dc2626",
+  borderRadius: 7,
+  padding: "9px 10px",
+  fontSize: 12,
+  lineHeight: 1.45,
+};
+
+const captureListHeaderStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  color: "#023465",
+  fontSize: 13,
+  fontWeight: 900,
+};
+
+const captureListStyle: CSSProperties = {
+  display: "grid",
+  gap: 10,
+  maxHeight: 320,
+  overflowY: "auto",
+};
+
+const captureEmptyStyle: CSSProperties = {
+  border: "1px dashed #cbd5e1",
+  borderRadius: 8,
+  padding: "24px 16px",
+  color: "#64748b",
+  textAlign: "center",
+  fontSize: 12,
+  lineHeight: 1.6,
+};
+
+const captureItemStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  background: "#fff",
+  border: "1px solid #dbe2ee",
+  borderRadius: 8,
+  padding: 8,
+};
+
+const captureItemNumberStyle: CSSProperties = {
+  width: 24,
+  height: 24,
+  borderRadius: 999,
+  background: "#023465",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 12,
+  fontWeight: 900,
+};
+
+const captureThumbStyle: CSSProperties = {
+  width: 96,
+  height: 58,
+  objectFit: "cover",
+  borderRadius: 6,
+  border: "1px solid #e2e8f0",
+  background: "#0f172a",
 };
 
 const signOutStyle: CSSProperties = {
