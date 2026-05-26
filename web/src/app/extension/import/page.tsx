@@ -30,7 +30,10 @@ export default function ExtensionImportPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(event.data.payload),
         });
-        const data = await res.json();
+        const contentType = res.headers.get("content-type") || "";
+        const data = contentType.includes("application/json")
+          ? await res.json()
+          : { error: await res.text() };
         if (!res.ok) {
           throw new Error(data.error || "Could not save guide.");
         }

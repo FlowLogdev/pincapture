@@ -79,10 +79,12 @@ recbtn.addEventListener("click", async () => {
 
 saveBtn.addEventListener("click", async () => {
   if (!steps.length) return;
-  setStatus("Opening dashboard importer...");
+  setStatus("Uploading screenshots...");
   try {
+    const uploadSteps = await prepareStepsForImport();
     const tab = await chrome.tabs.create({ url: `${APP_URL}/extension/import`, active: true });
-    const payload = { title: guideTitle(), steps };
+    const payload = { title: guideTitle(), steps: uploadSteps };
+    setStatus("Opening dashboard importer...");
     await sendImportPayload(tab.id, payload);
     setStatus("Import page opened.");
   } catch (error) {
@@ -280,6 +282,80 @@ function toExportPayload() {
       annotatedScreenshotUrl: step.annotatedScreenshotDataUrl || step.screenshotDataUrl
     }))
   };
+}
+
+async function prepareStepsForImport() {
+  const uploaded = new Map();
+  const prepared = [];
+
+  for (const [index, step] of steps.entries()) {
+    const next = {
+      ...step,
+      stepNumber: index + 1
+    };
+    const screenshotUrl = step.screenshotDataUrl || "";
+    const annotatedUrl = step.annotatedScreenshotDataUrl || screenshotUrl;
+    const uploadedScreenshot = await uploadDataUrlOnce(
+      uploaded,
+      screenshotUrl,
+      `${fileTitle()}-slide-${index + 1}.png`
+    );
+    const uploadedAnnotated = annotatedUrl === screenshotUrl
+      ? uploadedScreenshot
+      : await uploadDataUrlOnce(
+        uploaded,
+        annotatedUrl,
+        `${fileTitle()}-slide-${index + 1}-annotated.png`
+      );
+
+    next.screenshotDataUrl = uploadedScreenshot || screenshotUrl;
+    next.annotatedScreenshotDataUrl = uploadedAnnotated || uploadedScreenshot || annotatedUrl;
+    prepared.push(next);
+  }
+
+  return prepared;
+}
+
+async function uploadDataUrlOnce(cache, value, fileName) {
+  if (!value || !value.startsWith("data:")) return value;
+  if (cache.has(value)) return cache.get(value);
+
+  const blob = await dataUrlToBlob(value);
+  const url = await uploadCaptureBlob(blob, fileName, blob.type || "image/png");
+  cache.set(value, url);
+  return url;
+}
+
+async function dataUrlToBlob(value) {
+  const res = await fetch(value);
+  return res.blob();
+}
+
+async function uploadCaptureBlob(blob, fileName, contentType) {
+  const res = await fetch(`${APP_URL}/api/uploads/signed-url`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileName, contentType })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Sign in to PinCapture in the dashboard, then try again.");
+  }
+
+  const form = new FormData();
+  form.append("cacheControl", "3600");
+  form.append("", blob, fileName);
+
+  const upload = await fetch(data.signedUrl, {
+    method: "PUT",
+    body: form
+  });
+  if (!upload.ok) {
+    throw new Error(`Upload failed with status ${upload.status}.`);
+  }
+
+  return data.publicUrl;
 }
 
 function guideTitle() {

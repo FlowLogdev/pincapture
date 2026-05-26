@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PinCapture",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Capture screenshots and videos as step-by-step process guides and export them from PinCapture.",
   "permissions": [
     "activeTab",
