@@ -409,18 +409,25 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
       if (event.data.size > 0) chunksRef.current.push(event.data);
     };
     recorder.onstop = async () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" });
-      const dataUrl = await blobToDataUrl(blob);
-      setSteps([{
-        stepNumber: 1,
-        title: title.trim() || "Dashboard video capture",
-        description: "Recorded from dashboard screen share",
-        type: "video",
-        videoDataUrl: dataUrl,
-        url: window.location.href,
-      }]);
-      setRecording(false);
-      setStatus("Video recording stopped and is ready to save.");
+      try {
+        setStatus("Uploading video recording...");
+        const blob = new Blob(chunksRef.current, { type: "video/webm" });
+        const publicUrl = await uploadCaptureBlob(blob, `${safeFileName(title)}.webm`, "video/webm");
+        setSteps([{
+          stepNumber: 1,
+          title: title.trim() || "Dashboard video capture",
+          description: "Recorded from dashboard screen share",
+          type: "video",
+          videoDataUrl: publicUrl,
+          url: window.location.href,
+        }]);
+        setStatus("Video recording uploaded and is ready to save.");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Could not upload video recording.");
+        setStatus("Video recording stopped, but upload failed.");
+      } finally {
+        setRecording(false);
+      }
     };
     recorder.start(1000);
     setRecording(true);
@@ -741,13 +748,32 @@ function firstNameFromUser(name: string, email: string) {
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
-function blobToDataUrl(blob: Blob) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(blob);
+async function uploadCaptureBlob(blob: Blob, fileName: string, contentType: string) {
+  const res = await fetch("/api/uploads/signed-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileName, contentType }),
   });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Could not prepare video upload.");
+
+  const { error } = await supabase.storage
+    .from(data.bucket)
+    .uploadToSignedUrl(data.path, data.token, blob, {
+      contentType,
+      cacheControl: "3600",
+      upsert: true,
+    });
+
+  if (error) throw new Error(error.message || "Could not upload video.");
+  return data.publicUrl as string;
+}
+
+function safeFileName(value: string) {
+  return (value || "pincapture-video")
+    .replace(/[^a-z0-9._-]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "pincapture-video";
 }
 
 const headerStyle: CSSProperties = {

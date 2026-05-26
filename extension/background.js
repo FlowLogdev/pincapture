@@ -112,6 +112,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return;
   }
 
+  if (msg.action === "ADD_VIDEO_STEP") {
+    if (msg.step) {
+      sessionSteps.push(msg.step);
+      sessionSteps.forEach((step, index) => {
+        step.stepNumber = index + 1;
+      });
+    }
+    sendResponse({ ok: true, steps: sessionSteps });
+    return;
+  }
+
   if (msg.action === "UPDATE_STEP_ANNOTATION") {
     const step = sessionSteps.find((item) => item.id === msg.stepId);
     if (step) {

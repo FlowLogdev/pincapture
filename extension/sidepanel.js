@@ -2,10 +2,15 @@ const APP_URL = "https://pincapture.flowlog.dev";
 
 let recording = false;
 let steps = [];
+let videoStream = null;
+let videoRecorder = null;
+let videoChunks = [];
 
 const captureBtn = document.getElementById("capturebtn");
 const captureText = document.getElementById("capturetext");
 const shotBtn = document.getElementById("shotbtn");
+const startVideoBtn = document.getElementById("startvideo");
+const stopVideoBtn = document.getElementById("stopvideo");
 const stepsarea = document.getElementById("stepsarea");
 const empty = document.getElementById("empty");
 const guidetitle = document.getElementById("guidetitle");
@@ -93,6 +98,76 @@ shotBtn.addEventListener("click", async () => {
     setStatus(`Captured slide ${res.step.stepNumber}.`);
   } catch (error) {
     setStatus(error instanceof Error ? error.message : "Could not capture screenshot.", true);
+  }
+});
+
+startVideoBtn.addEventListener("click", async () => {
+  if (videoRecorder?.state === "recording") return;
+  setStatus("Choose the tab, window, or screen you want to record.");
+
+  try {
+    videoStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: false
+    });
+
+    videoChunks = [];
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : "video/webm";
+    videoRecorder = new MediaRecorder(videoStream, { mimeType });
+    videoRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) videoChunks.push(event.data);
+    };
+    videoRecorder.onstop = async () => {
+      try {
+        setStatus("Uploading video recording...");
+        const blob = new Blob(videoChunks, { type: "video/webm" });
+        const videoDataUrl = await uploadCaptureBlob(blob, `${fileTitle()}-${Date.now()}.webm`, "video/webm");
+        const stepNumber = steps.length + 1;
+        const step = {
+          id: crypto.randomUUID(),
+          stepNumber,
+          title: `Video recording ${stepNumber}`,
+          description: "Recorded from the PinCapture Chrome extension.",
+          type: "video",
+          videoDataUrl,
+          url: "",
+          timestamp: Date.now()
+        };
+        steps.push(step);
+        await chrome.runtime.sendMessage({ action: "ADD_VIDEO_STEP", step });
+        renderSteps();
+        setStatus(`Video recording ${stepNumber} is ready to save.`);
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "Could not prepare video recording.", true);
+      } finally {
+        stopVideoTracks();
+        setVideoUi(false);
+      }
+    };
+    videoStream.getVideoTracks()[0]?.addEventListener("ended", () => {
+      if (videoRecorder?.state === "recording") {
+        videoRecorder.stop();
+      } else {
+        stopVideoTracks();
+        setVideoUi(false);
+      }
+    });
+    videoRecorder.start(1000);
+    setVideoUi(true);
+    setStatus("Recording video...");
+  } catch (error) {
+    stopVideoTracks();
+    setVideoUi(false);
+    setStatus(error instanceof Error ? error.message : "Could not start video capture.", true);
+  }
+});
+
+stopVideoBtn.addEventListener("click", () => {
+  if (videoRecorder?.state === "recording") {
+    setStatus("Stopping video recording...");
+    videoRecorder.stop();
   }
 });
 
@@ -192,11 +267,16 @@ function createSlideCard(step) {
   });
   top.appendChild(del);
 
-  const img = document.createElement("img");
-  img.alt = `Slide ${step.stepNumber}`;
-  img.src = step.annotatedScreenshotDataUrl || step.screenshotDataUrl || "";
+  const media = document.createElement(step.type === "video" ? "video" : "img");
+  if (step.type === "video") {
+    media.controls = true;
+    media.src = step.videoDataUrl || step.annotatedScreenshotDataUrl || step.screenshotDataUrl || "";
+  } else {
+    media.alt = `Slide ${step.stepNumber}`;
+    media.src = step.annotatedScreenshotDataUrl || step.screenshotDataUrl || "";
+  }
 
-  card.append(top, img);
+  card.append(top, media);
   return card;
 }
 
@@ -215,6 +295,16 @@ function setRecordingUi(value) {
   captureBtn.className = value ? "on" : "";
   captureText.textContent = value ? "Stop Screenshots" : "Start Capture Screenshots";
   shotBtn.disabled = !value;
+}
+
+function setVideoUi(value) {
+  startVideoBtn.disabled = value;
+  stopVideoBtn.disabled = !value;
+}
+
+function stopVideoTracks() {
+  videoStream?.getTracks().forEach((track) => track.stop());
+  videoStream = null;
 }
 
 function setStatus(message, isError = false) {
@@ -307,10 +397,37 @@ function toExportPayload() {
       title: step.title,
       description: step.description || "",
       type: step.type || "click",
-      screenshotUrl: step.screenshotDataUrl,
-      annotatedScreenshotUrl: step.annotatedScreenshotDataUrl || step.screenshotDataUrl
+      screenshotUrl: step.screenshotDataUrl || step.videoDataUrl,
+      annotatedScreenshotUrl: step.annotatedScreenshotDataUrl || step.screenshotDataUrl || step.videoDataUrl
     }))
   };
+}
+
+async function uploadCaptureBlob(blob, fileName, contentType) {
+  const res = await fetch(`${APP_URL}/api/uploads/signed-url`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileName, contentType })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Sign in to PinCapture in the dashboard, then try video again.");
+  }
+
+  const form = new FormData();
+  form.append("cacheControl", "3600");
+  form.append("", blob, fileName);
+
+  const upload = await fetch(data.signedUrl, {
+    method: "PUT",
+    body: form
+  });
+  if (!upload.ok) {
+    throw new Error(`Video upload failed with status ${upload.status}.`);
+  }
+
+  return data.publicUrl;
 }
 
 function guideTitle() {

@@ -88,6 +88,24 @@
       color: #023465;
       min-height: 46px;
     }
+    #videoControls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    #startvideo, #stopvideo {
+      min-height: 44px;
+    }
+    #startvideo {
+      background: #fff;
+      color: #023465;
+    }
+    #stopvideo {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: #fff;
+    }
     #pulse {
       width: 8px;
       height: 8px;
@@ -181,13 +199,14 @@
       background: transparent;
       flex-shrink: 0;
     }
-    .slide img {
+    .slide img, .slide video {
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: contain;
       background: #fff;
     }
+    .slide video { background: #000; }
     #footer {
       background: #fff;
       border-top: 1px solid #e2e8f0;
@@ -225,6 +244,10 @@
         <span id="capturetext">Start Capture Screenshots</span>
       </button>
       <button id="shotbtn" disabled>Capture screenshot</button>
+      <div id="videoControls">
+        <button id="startvideo">Start video</button>
+        <button id="stopvideo" disabled>Stop video</button>
+      </div>
     </div>
 
     <div id="status"></div>
