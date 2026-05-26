@@ -25,10 +25,27 @@ export default function ExtensionImportPage() {
       setError("");
 
       try {
+        const payload = event.data.payload;
+        const stillContainsEmbeddedMedia = payload?.steps?.some((step: unknown) => {
+          if (!step || typeof step !== "object") return false;
+          const item = step as {
+            screenshotDataUrl?: string;
+            annotatedScreenshotDataUrl?: string;
+            videoDataUrl?: string;
+          };
+          return item.screenshotDataUrl?.startsWith("data:")
+            || item.annotatedScreenshotDataUrl?.startsWith("data:")
+            || item.videoDataUrl?.startsWith("data:");
+        });
+
+        if (stillContainsEmbeddedMedia) {
+          throw new Error("This capture was sent by an older PinCapture extension. Reload the extension in chrome://extensions, then click Finish and save again. Your slides are still in the side panel.");
+        }
+
         const res = await fetch("/api/guides/import", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(event.data.payload),
+          body: JSON.stringify(payload),
         });
         const contentType = res.headers.get("content-type") || "";
         const data = contentType.includes("application/json")
