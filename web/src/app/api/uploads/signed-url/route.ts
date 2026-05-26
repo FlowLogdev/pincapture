@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   if (bucketError) {
     const { error: createError } = await service.storage.createBucket(BUCKET, {
       public: true,
-      fileSizeLimit: 104857600,
+      fileSizeLimit: 52428800,
       allowedMimeTypes: ["video/webm", "image/png", "image/jpeg"],
     });
     if (createError) {
