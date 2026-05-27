@@ -3,19 +3,146 @@
 @tailwind utilities;
 
 :root {
-  --brand: #1a6bff;
-  --surface: #f6f7fb;
-  --border: #e2e5ef;
-  --text: #0d0f1a;
-  --muted: #6b7280;
+  --font-inter: system-ui, -apple-system, sans-serif;
+
+  /* Brand */
+  --navy:        oklch(21% 0.072 256);
+  --navy-mid:    oklch(28% 0.078 256);
+  --navy-deep:   oklch(15% 0.060 256);
+  --yellow:      oklch(88% 0.190 96);
+  --yellow-dim:  oklch(93% 0.100 96);
+
+  /* Surfaces */
+  --surface:     oklch(97.5% 0.005 255);
+  --surface-2:   oklch(94%   0.008 255);
+  --surface-3:   oklch(91%   0.011 255);
+
+  /* Text */
+  --text:        oklch(14%  0.018 255);
+  --text-muted:  oklch(50%  0.014 255);
+  --text-faint:  oklch(65%  0.010 255);
+
+  /* Borders */
+  --border:      oklch(88%  0.010 255);
+  --border-mid:  oklch(82%  0.014 255);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
 body {
   background: var(--surface);
   color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Keyframes ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* ── Animation classes ── */
+.anim-slide-down  { animation: slideDown  0.4s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-fade-up     { animation: fadeUp     0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-slide-right { animation: slideRight 0.6s  cubic-bezier(0.22,1,0.36,1) both; }
+
+.delay-0   { animation-delay: 0ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+
+/* Skeleton shimmer */
+.shimmer {
+  background: linear-gradient(90deg, oklch(82% 0.012 255) 25%, oklch(88% 0.008 255) 50%, oklch(82% 0.012 255) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ── Hero layout ── */
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 840px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero-mockup {
+    display: none;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .formats-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .formats-pills {
+    justify-content: flex-start !important;
+  }
+
+  .footer-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-links-secondary {
+    display: none;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .anim-slide-down,
+  .anim-fade-up,
+  .anim-slide-right {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .shimmer {
+    animation: none;
+  }
 }
