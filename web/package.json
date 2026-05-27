@@ -15,12 +15,12 @@
     "docx": "^8.5.0",
     "framer-motion": "^12.40.0",
     "jszip": "^3.10.1",
-    "next": "14.2.3",
+    "next": "15.5.18",
     "pptxgenjs": "^3.12.0",
     "react": "^18",
     "react-dom": "^18",
     "resend": "^3.2.0",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
