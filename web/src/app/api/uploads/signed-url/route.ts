@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { CAPTURE_FILE_SIZE_LIMIT_BYTES } from "@/lib/resumable-upload";
 
 const BUCKET = "captures";
+const ALLOWED_CONTENT_TYPES = new Set(["video/webm", "image/png", "image/jpeg"]);
+
+function resumableUploadUrl() {
+  const projectUrl = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!);
+  if (projectUrl.hostname.endsWith(".supabase.co")) {
+    projectUrl.hostname = projectUrl.hostname.replace(/\.supabase\.co$/, ".storage.supabase.co");
+  }
+  projectUrl.pathname = "/storage/v1/upload/resumable/sign";
+  projectUrl.search = "";
+  projectUrl.hash = "";
+  return projectUrl.toString();
+}
 
 function createServiceClient() {
   return createClient(
@@ -33,6 +46,9 @@ export async function POST(req: NextRequest) {
     .replace(/^-+|-+$/g, "")
     .slice(0, 120) || "capture.webm";
   const type = contentType || "video/webm";
+  if (!ALLOWED_CONTENT_TYPES.has(type)) {
+    return corsResponse(req, { error: `Unsupported capture type: ${type}` }, 400);
+  }
   const path = `${user.id}/${Date.now()}-${safeName}`;
   const service = createServiceClient();
 
@@ -40,8 +56,8 @@ export async function POST(req: NextRequest) {
   if (bucketError) {
     const { error: createError } = await service.storage.createBucket(BUCKET, {
       public: true,
-      fileSizeLimit: 52428800,
-      allowedMimeTypes: ["video/webm", "image/png", "image/jpeg"],
+      fileSizeLimit: CAPTURE_FILE_SIZE_LIMIT_BYTES,
+      allowedMimeTypes: Array.from(ALLOWED_CONTENT_TYPES),
     });
     if (createError) {
       return corsResponse(req,
@@ -71,6 +87,8 @@ export async function POST(req: NextRequest) {
     signedUrl: data.signedUrl,
     publicUrl: publicData.publicUrl,
     contentType: type,
+    resumableUrl: resumableUploadUrl(),
+    maxFileSizeBytes: CAPTURE_FILE_SIZE_LIMIT_BYTES,
   });
 }
 

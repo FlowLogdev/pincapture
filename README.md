@@ -75,6 +75,14 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 6. Repeat for each step
 7. Press **Stop recording** → export to PDF, Word, DOCX, or PPTX
 
+### Video recording
+
+1. Open the PinCapture side panel and click **Start video**.
+2. Choose the tab, window, or screen to share.
+3. Record for up to 10 minutes, then click **Stop video**.
+4. PinCapture uploads the WebM recording in resumable 6 MiB chunks and shows progress.
+5. After the upload finishes, click **Finish and save to dashboard**.
+
 ## Deploy
 
 ```bash
@@ -85,6 +93,6 @@ vercel deploy
 ## Extend
 
 - Add AI step descriptions: call Claude API with the screenshot + element label
-- Video recording: use `chrome.tabCapture.capture()` in background.js
+- Longer or higher-resolution video: move the Supabase project to a paid plan and raise both global and `captures` bucket file limits
 - Team sharing: add org_id to guides table + invite system
 - Embed in Notion/Confluence: generate an iframe-embeddable viewer route

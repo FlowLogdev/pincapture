@@ -88,8 +88,8 @@ export default function DocsPage() {
               Use the card action menu to move guides to Archive Folder or Trash. Archive keeps completed guides organized by month. Trash keeps deleted guides recoverable. Permanent Delete moves a guide into Deleted Records instead of removing the database rows, so an administrator can still locate it by date or file name.
             </DocSection>
 
-            <DocSection title="8. Video capture status">
-              Screenshot capture is active now. Video capture is planned for the same right-side panel workflow: start video capture, record the visible browser tab, stop recording, then save the recording to the dashboard. The UI and storage model should keep video separate from numbered screenshot slides.
+            <DocSection title="8. Record and save video">
+              Click <strong>Start video</strong> in the right-side panel, choose the tab, window, or screen to share, and click <strong>Stop video</strong> when finished. PinCapture optimizes recordings for a maximum of 10 minutes and uploads larger files in resumable chunks with progress shown in the panel. When the upload finishes, click <strong>Finish and save to dashboard</strong>.
             </DocSection>
           </section>
 

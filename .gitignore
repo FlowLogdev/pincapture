@@ -22,6 +22,7 @@ web/.vercel/
 # Logs
 *.log
 web/*.log
+*.tsbuildinfo
 
 # OS/editor noise
 .DS_Store

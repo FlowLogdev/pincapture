@@ -1,3 +1,12 @@
+import {
+  formatFileSize,
+  MAX_VIDEO_DURATION_MS,
+  RESUMABLE_UPLOAD_THRESHOLD_BYTES,
+  uploadBlobResumable,
+  uploadHttpError,
+  VIDEO_BITS_PER_SECOND
+} from "./resumable-upload.mjs";
+
 const APP_URL = "https://pincapture.flowlog.dev";
 
 let recording = false;
@@ -5,6 +14,7 @@ let steps = [];
 let videoStream = null;
 let videoRecorder = null;
 let videoChunks = [];
+let videoStopTimer = null;
 
 const captureBtn = document.getElementById("capturebtn");
 const captureText = document.getElementById("capturetext");
@@ -107,7 +117,11 @@ startVideoBtn.addEventListener("click", async () => {
 
   try {
     videoStream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        frameRate: { ideal: 15, max: 15 }
+      },
       audio: false
     });
 
@@ -115,11 +129,15 @@ startVideoBtn.addEventListener("click", async () => {
     const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
       ? "video/webm;codecs=vp9"
       : "video/webm";
-    videoRecorder = new MediaRecorder(videoStream, { mimeType });
+    videoRecorder = new MediaRecorder(videoStream, {
+      mimeType,
+      videoBitsPerSecond: VIDEO_BITS_PER_SECOND
+    });
     videoRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) videoChunks.push(event.data);
     };
     videoRecorder.onstop = async () => {
+      clearVideoStopTimer();
       try {
         setStatus("Uploading video recording...");
         const blob = new Blob(videoChunks, { type: "video/webm" });
@@ -155,8 +173,14 @@ startVideoBtn.addEventListener("click", async () => {
       }
     });
     videoRecorder.start(1000);
+    videoStopTimer = setTimeout(() => {
+      if (videoRecorder?.state === "recording") {
+        setStatus("10-minute recording limit reached. Preparing upload...");
+        videoRecorder.stop();
+      }
+    }, MAX_VIDEO_DURATION_MS);
     setVideoUi(true);
-    setStatus("Recording video...");
+    setStatus("Recording video... Maximum length is 10 minutes.");
   } catch (error) {
     stopVideoTracks();
     setVideoUi(false);
@@ -305,8 +329,16 @@ function setVideoUi(value) {
 }
 
 function stopVideoTracks() {
+  clearVideoStopTimer();
   videoStream?.getTracks().forEach((track) => track.stop());
   videoStream = null;
+}
+
+function clearVideoStopTimer() {
+  if (videoStopTimer) {
+    clearTimeout(videoStopTimer);
+    videoStopTimer = null;
+  }
 }
 
 function setStatus(message, isError = false) {
@@ -468,6 +500,29 @@ async function uploadCaptureBlob(blob, fileName, contentType) {
     throw new Error(data.error || "Sign in to PinCapture in the dashboard, then try again.");
   }
 
+  if (data.maxFileSizeBytes && blob.size > data.maxFileSizeBytes) {
+    throw new Error(
+      `The recording is ${formatFileSize(blob.size)}, above the ${formatFileSize(data.maxFileSizeBytes)} upload limit.`
+    );
+  }
+
+  if (blob.size > RESUMABLE_UPLOAD_THRESHOLD_BYTES) {
+    if (!data.resumableUrl) throw new Error("The server did not provide a resumable upload URL.");
+    await uploadBlobResumable({
+      endpoint: data.resumableUrl,
+      blob,
+      token: data.token,
+      bucketName: data.bucket,
+      objectName: data.path,
+      contentType,
+      onProgress: (uploadedBytes, totalBytes) => {
+        const percent = Math.round((uploadedBytes / totalBytes) * 100);
+        setStatus(`Uploading ${formatFileSize(totalBytes)} recording... ${percent}%`);
+      }
+    });
+    return data.publicUrl;
+  }
+
   const form = new FormData();
   form.append("cacheControl", "3600");
   form.append("", blob, fileName);
@@ -477,7 +532,7 @@ async function uploadCaptureBlob(blob, fileName, contentType) {
     body: form
   });
   if (!upload.ok) {
-    throw new Error(`Upload failed with status ${upload.status}.`);
+    throw await uploadHttpError(upload, "Upload failed");
   }
 
   return data.publicUrl;

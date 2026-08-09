@@ -3,6 +3,14 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase, type Guide } from "@/lib/supabase";
+import {
+  AUDIO_BITS_PER_SECOND,
+  formatFileSize,
+  MAX_VIDEO_DURATION_MS,
+  RESUMABLE_UPLOAD_THRESHOLD_BYTES,
+  uploadBlobResumable,
+  VIDEO_BITS_PER_SECOND,
+} from "@/lib/resumable-upload";
 
 type GuideViewMode = "active" | "videos" | "archived" | "trashed" | "deleted";
 type ViewMode = GuideViewMode | "tickets" | "adminTickets";
@@ -310,6 +318,7 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
+  const recordingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const [title, setTitle] = useState(mode === "video" ? "Dashboard video capture" : "Dashboard screenshot capture");
   const [steps, setSteps] = useState<DashboardCaptureStep[]>([]);
@@ -333,7 +342,13 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
     try {
       stopStream();
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: mode === "video"
+          ? {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              frameRate: { ideal: 15, max: 15 },
+            }
+          : true,
         audio: mode === "video",
       });
       streamRef.current = stream;
@@ -354,12 +369,20 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
   }
 
   function stopStream() {
+    clearRecordingTimeout();
     recorderRef.current?.state === "recording" && recorderRef.current.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     setSharing(false);
     setRecording(false);
+  }
+
+  function clearRecordingTimeout() {
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current);
+      recordingTimeoutRef.current = null;
+    }
   }
 
   function captureScreenshot() {
@@ -404,16 +427,32 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
     const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
       ? "video/webm;codecs=vp9"
       : "video/webm";
-    const recorder = new MediaRecorder(stream, { mimeType });
+    const recorderOptions: MediaRecorderOptions = {
+      mimeType,
+      videoBitsPerSecond: VIDEO_BITS_PER_SECOND,
+    };
+    if (stream.getAudioTracks().length) {
+      recorderOptions.audioBitsPerSecond = AUDIO_BITS_PER_SECOND;
+    }
+    const recorder = new MediaRecorder(stream, recorderOptions);
     recorderRef.current = recorder;
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) chunksRef.current.push(event.data);
     };
     recorder.onstop = async () => {
+      clearRecordingTimeout();
       try {
         setStatus("Uploading video recording...");
         const blob = new Blob(chunksRef.current, { type: "video/webm" });
-        const publicUrl = await uploadCaptureBlob(blob, `${safeFileName(title)}.webm`, "video/webm");
+        const publicUrl = await uploadCaptureBlob(
+          blob,
+          `${safeFileName(title)}.webm`,
+          "video/webm",
+          (uploadedBytes, totalBytes) => {
+            const percent = Math.round((uploadedBytes / totalBytes) * 100);
+            setStatus(`Uploading video recording... ${percent}%`);
+          }
+        );
         setSteps([{
           stepNumber: 1,
           title: title.trim() || "Dashboard video capture",
@@ -431,8 +470,14 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
       }
     };
     recorder.start(1000);
+    recordingTimeoutRef.current = setTimeout(() => {
+      if (recorder.state === "recording") {
+        setStatus("10-minute recording limit reached. Preparing upload...");
+        recorder.stop();
+      }
+    }, MAX_VIDEO_DURATION_MS);
     setRecording(true);
-    setStatus("Recording video...");
+    setStatus("Recording video... Maximum length is 10 minutes.");
     setError("");
   }
 
@@ -495,13 +540,16 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
             Capture screenshot
           </button>
         ) : (
-          <button
-            onClick={recording ? stopVideoRecording : startVideoRecording}
-            disabled={!sharing}
-            style={recording ? captureDangerButtonStyle : capturePrimaryButtonStyle}
-          >
-            {recording ? "Stop video" : "Start video"}
-          </button>
+          <>
+            <button
+              onClick={recording ? stopVideoRecording : startVideoRecording}
+              disabled={!sharing}
+              style={recording ? captureDangerButtonStyle : capturePrimaryButtonStyle}
+            >
+              {recording ? "Stop video" : "Start video"}
+            </button>
+            <div style={captureStatusStyle}>Optimized for reliable recordings up to 10 minutes.</div>
+          </>
         )}
 
         {error && <div style={captureErrorStyle}>{error}</div>}
@@ -759,7 +807,12 @@ function firstNameFromUser(name: string, email: string) {
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
-async function uploadCaptureBlob(blob: Blob, fileName: string, contentType: string) {
+async function uploadCaptureBlob(
+  blob: Blob,
+  fileName: string,
+  contentType: string,
+  onProgress?: (uploadedBytes: number, totalBytes: number) => void
+) {
   const res = await fetch("/api/uploads/signed-url", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -767,6 +820,26 @@ async function uploadCaptureBlob(blob: Blob, fileName: string, contentType: stri
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Could not prepare video upload.");
+
+  if (data.maxFileSizeBytes && blob.size > data.maxFileSizeBytes) {
+    throw new Error(
+      `The recording is ${formatFileSize(blob.size)}, above the ${formatFileSize(data.maxFileSizeBytes)} upload limit.`
+    );
+  }
+
+  if (blob.size > RESUMABLE_UPLOAD_THRESHOLD_BYTES) {
+    if (!data.resumableUrl) throw new Error("The server did not provide a resumable upload URL.");
+    await uploadBlobResumable({
+      endpoint: data.resumableUrl,
+      blob,
+      token: data.token,
+      bucketName: data.bucket,
+      objectName: data.path,
+      contentType,
+      onProgress,
+    });
+    return data.publicUrl as string;
+  }
 
   const { error } = await supabase.storage
     .from(data.bucket)
