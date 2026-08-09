@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase, type Guide, type Step } from "@/lib/supabase";
+import { videoDownloadFileName, videoDownloadUrl } from "@/lib/video-download";
 
 type Params = { id: string };
 
@@ -312,6 +313,7 @@ export default function GuidePage({ params }: { params: Params }) {
           ) : (
             <StepEditor
               step={selectedStep}
+              guideTitle={guide.title}
               totalSteps={steps.length}
               onTitleSave={(title) => updateStepTitle(selectedStep, title)}
               onDelete={() => deleteStep(selectedStep.id)}
@@ -334,13 +336,27 @@ const exportBtnStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
+const videoDownloadButtonStyle: React.CSSProperties = {
+  background: "#023465",
+  color: "#fff",
+  border: "1px solid #023465",
+  borderRadius: 6,
+  padding: "5px 11px",
+  fontSize: 12,
+  fontWeight: 700,
+  textDecoration: "none",
+  whiteSpace: "nowrap",
+};
+
 function StepEditor({
   step,
+  guideTitle,
   totalSteps,
   onTitleSave,
   onDelete,
 }: {
   step: Step;
+  guideTitle: string;
   totalSteps: number;
   onTitleSave: (title: string) => void;
   onDelete: () => void;
@@ -353,6 +369,10 @@ function StepEditor({
 
   const mediaSrc = step.annotated_screenshot_url || step.screenshot_url;
   const isVideo = step.type === "video" || mediaSrc?.startsWith("data:video/");
+  const downloadName = videoDownloadFileName(guideTitle, step.step_number);
+  const downloadUrl = isVideo && mediaSrc
+    ? videoDownloadUrl(mediaSrc, downloadName)
+    : null;
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto" }}>
@@ -385,6 +405,11 @@ function StepEditor({
         >
           {step.type}
         </span>
+        {downloadUrl && (
+          <a href={downloadUrl} download={downloadName} style={videoDownloadButtonStyle}>
+            Download
+          </a>
+        )}
         <button
           onClick={onDelete}
           style={{

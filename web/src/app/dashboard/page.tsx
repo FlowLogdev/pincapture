@@ -11,6 +11,7 @@ import {
   uploadBlobResumable,
   VIDEO_BITS_PER_SECOND,
 } from "@/lib/resumable-upload";
+import { videoDownloadFileName, videoDownloadUrl } from "@/lib/video-download";
 
 type GuideViewMode = "active" | "videos" | "archived" | "trashed" | "deleted";
 type ViewMode = GuideViewMode | "tickets" | "adminTickets";
@@ -702,6 +703,11 @@ function GuideCard({
   onMenu: () => void;
   onAction: (id: string, action: "archive" | "restore" | "trash" | "recover" | "permanentDelete") => void;
 }) {
+  const downloadName = videoDownloadFileName(guide.title);
+  const downloadUrl = guide.video_download_url
+    ? videoDownloadUrl(guide.video_download_url, downloadName)
+    : null;
+
   return (
     <div style={cardStyle}>
       <button onClick={onMenu} aria-label="Guide actions" style={cardMenuButtonStyle}>...</button>
@@ -750,8 +756,13 @@ function GuideCard({
           Last recorded: {formatRecordedAt(guide.last_recorded_at || guide.updated_at)}
         </div>
       </div>
-      <div style={{ padding: "10px 16px", borderTop: "1px solid #e2e5ef" }}>
+      <div style={cardActionsStyle}>
         <Link href={`/guide/${guide.id}`} style={openButtonStyle}>Open</Link>
+        {guide.has_video && downloadUrl && (
+          <a href={downloadUrl} download={downloadName} style={downloadButtonStyle}>
+            Download
+          </a>
+        )}
       </div>
     </div>
   );
@@ -1301,6 +1312,7 @@ const videoPillStyle: CSSProperties = {
 
 const openButtonStyle: CSSProperties = {
   display: "block",
+  flex: 1,
   textAlign: "center",
   padding: "8px 0",
   background: "#023465",
@@ -1309,6 +1321,19 @@ const openButtonStyle: CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
   textDecoration: "none",
+};
+
+const cardActionsStyle: CSSProperties = {
+  display: "flex",
+  gap: 8,
+  padding: "10px 16px",
+  borderTop: "1px solid #e2e5ef",
+};
+
+const downloadButtonStyle: CSSProperties = {
+  ...openButtonStyle,
+  background: "#FFDD00",
+  color: "#023465",
 };
 
 const errorStyle: CSSProperties = {

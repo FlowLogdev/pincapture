@@ -89,7 +89,7 @@ export default function DocsPage() {
             </DocSection>
 
             <DocSection title="8. Record and save video">
-              Click <strong>Start video</strong> in the right-side panel, choose the tab, window, or screen to share, and click <strong>Stop video</strong> when finished. PinCapture optimizes recordings for a maximum of 10 minutes and uploads larger files in resumable chunks with progress shown in the panel. When the upload finishes, click <strong>Finish and save to dashboard</strong>.
+              Click <strong>Start video</strong> in the right-side panel, choose the tab, window, or screen to share, and click <strong>Stop video</strong> when finished. PinCapture optimizes recordings for a maximum of 10 minutes and uploads larger files in resumable chunks with progress shown in the panel. When the upload finishes, click <strong>Finish and save to dashboard</strong>. Use <strong>Download</strong> on a saved video card or beside an opened video to save the WebM file to your computer.
             </DocSection>
           </section>
 

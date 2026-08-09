@@ -92,6 +92,10 @@ export async function GET(req: NextRequest) {
           || screenshotUrl.includes(".webm")
           || annotatedUrl.includes(".webm");
       });
+      const firstVideo = videoSteps[0];
+      const firstVideoUrl = firstVideo
+        ? firstVideo.annotated_screenshot_url || firstVideo.screenshot_url || null
+        : null;
       const lastRecordedAt = stepDates.at(-1) || guide.created_at || guide.updated_at;
       const state = readState(guide.description);
       const stateDate = state.archivedAt || state.trashedAt || state.deletedAt || lastRecordedAt;
@@ -102,6 +106,7 @@ export async function GET(req: NextRequest) {
         step_count: steps.length,
         has_video: videoSteps.length > 0,
         video_count: videoSteps.length,
+        video_download_url: firstVideoUrl?.startsWith("data:") ? null : firstVideoUrl,
         last_recorded_at: lastRecordedAt,
         archived_at: state.archivedAt,
         trashed_at: state.trashedAt,

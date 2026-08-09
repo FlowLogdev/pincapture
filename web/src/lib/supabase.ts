@@ -16,6 +16,7 @@ export type Guide = {
   step_count?: number;
   has_video?: boolean;
   video_count?: number;
+  video_download_url?: string | null;
   last_recorded_at?: string;
   archived_at?: string | null;
   trashed_at?: string | null;
