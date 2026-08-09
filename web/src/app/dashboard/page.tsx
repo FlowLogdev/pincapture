@@ -11,7 +11,11 @@ import {
   uploadBlobResumable,
   VIDEO_BITS_PER_SECOND,
 } from "@/lib/resumable-upload";
-import { videoDownloadFileName, videoDownloadUrl } from "@/lib/video-download";
+import {
+  selectMp4RecordingMimeType,
+  videoDownloadFileName,
+  videoDownloadUrl,
+} from "@/lib/video-download";
 
 type GuideViewMode = "active" | "videos" | "archived" | "trashed" | "deleted";
 type ViewMode = GuideViewMode | "tickets" | "adminTickets";
@@ -425,17 +429,29 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
     }
 
     chunksRef.current = [];
-    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-      ? "video/webm;codecs=vp9"
-      : "video/webm";
+    const includeAudio = stream.getAudioTracks().length > 0;
+    const mimeType = selectMp4RecordingMimeType(
+      MediaRecorder.isTypeSupported.bind(MediaRecorder),
+      includeAudio
+    );
+    if (!mimeType) {
+      setError("This browser cannot record MP4 video. Update Chrome and try again.");
+      return;
+    }
     const recorderOptions: MediaRecorderOptions = {
       mimeType,
       videoBitsPerSecond: VIDEO_BITS_PER_SECOND,
     };
-    if (stream.getAudioTracks().length) {
+    if (includeAudio) {
       recorderOptions.audioBitsPerSecond = AUDIO_BITS_PER_SECOND;
     }
-    const recorder = new MediaRecorder(stream, recorderOptions);
+    let recorder: MediaRecorder;
+    try {
+      recorder = new MediaRecorder(stream, recorderOptions);
+    } catch {
+      setError("MP4 recording could not start. Update Chrome and try again.");
+      return;
+    }
     recorderRef.current = recorder;
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) chunksRef.current.push(event.data);
@@ -444,11 +460,11 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
       clearRecordingTimeout();
       try {
         setStatus("Uploading video recording...");
-        const blob = new Blob(chunksRef.current, { type: "video/webm" });
+        const blob = new Blob(chunksRef.current, { type: "video/mp4" });
         const publicUrl = await uploadCaptureBlob(
           blob,
-          `${safeFileName(title)}.webm`,
-          "video/webm",
+          `${safeFileName(title)}.mp4`,
+          "video/mp4",
           (uploadedBytes, totalBytes) => {
             const percent = Math.round((uploadedBytes / totalBytes) * 100);
             setStatus(`Uploading video recording... ${percent}%`);
@@ -703,7 +719,7 @@ function GuideCard({
   onMenu: () => void;
   onAction: (id: string, action: "archive" | "restore" | "trash" | "recover" | "permanentDelete") => void;
 }) {
-  const downloadName = videoDownloadFileName(guide.title);
+  const downloadName = videoDownloadFileName(guide.title, undefined, guide.video_download_url || undefined);
   const downloadUrl = guide.video_download_url
     ? videoDownloadUrl(guide.video_download_url, downloadName)
     : null;

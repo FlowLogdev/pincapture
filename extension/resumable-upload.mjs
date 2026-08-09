@@ -7,6 +7,19 @@ export const VIDEO_BITS_PER_SECOND = 500000;
 export const AUDIO_BITS_PER_SECOND = 48000;
 export const RESUMABLE_UPLOAD_THRESHOLD_BYTES = 6 * 1024 * 1024;
 export const TUS_CHUNK_SIZE_BYTES = 6 * 1024 * 1024;
+export const MP4_RECORDING_MIME_TYPES = [
+  "video/mp4;codecs=avc3.42E01E,mp4a.40.2",
+  "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+  "video/mp4;codecs=avc3.42E01E",
+  "video/mp4;codecs=avc1.42E01E",
+  "video/mp4"
+];
+
+export function selectMp4RecordingMimeType(isTypeSupported, includeAudio = false) {
+  return MP4_RECORDING_MIME_TYPES.find((mimeType) =>
+    (includeAudio || !mimeType.includes("mp4a")) && isTypeSupported(mimeType)
+  ) || null;
+}
 
 function encodeBase64(value) {
   const bytes = new TextEncoder().encode(value);

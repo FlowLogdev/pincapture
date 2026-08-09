@@ -80,7 +80,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 1. Open the PinCapture side panel and click **Start video**.
 2. Choose the tab, window, or screen to share.
 3. Record for up to 10 minutes, then click **Stop video**.
-4. PinCapture uploads the WebM recording in resumable 6 MiB chunks and shows progress.
+4. PinCapture records a genuine MP4 file, uploads it in resumable 6 MiB chunks, and shows progress. A current Chrome version with MP4 MediaRecorder support is required.
 5. After the upload finishes, click **Finish and save to dashboard**.
 
 ## Deploy

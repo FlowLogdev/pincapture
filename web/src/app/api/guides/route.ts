@@ -90,7 +90,9 @@ export async function GET(req: NextRequest) {
           || screenshotUrl.startsWith("data:video/")
           || annotatedUrl.startsWith("data:video/")
           || screenshotUrl.includes(".webm")
-          || annotatedUrl.includes(".webm");
+          || annotatedUrl.includes(".webm")
+          || screenshotUrl.includes(".mp4")
+          || annotatedUrl.includes(".mp4");
       });
       const firstVideo = videoSteps[0];
       const firstVideoUrl = firstVideo

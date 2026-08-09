@@ -2,6 +2,7 @@ import {
   formatFileSize,
   MAX_VIDEO_DURATION_MS,
   RESUMABLE_UPLOAD_THRESHOLD_BYTES,
+  selectMp4RecordingMimeType,
   uploadBlobResumable,
   uploadHttpError,
   VIDEO_BITS_PER_SECOND
@@ -126,9 +127,12 @@ startVideoBtn.addEventListener("click", async () => {
     });
 
     videoChunks = [];
-    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-      ? "video/webm;codecs=vp9"
-      : "video/webm";
+    const mimeType = selectMp4RecordingMimeType(
+      MediaRecorder.isTypeSupported.bind(MediaRecorder)
+    );
+    if (!mimeType) {
+      throw new Error("This browser cannot record MP4 video. Update Chrome and try again.");
+    }
     videoRecorder = new MediaRecorder(videoStream, {
       mimeType,
       videoBitsPerSecond: VIDEO_BITS_PER_SECOND
@@ -140,8 +144,8 @@ startVideoBtn.addEventListener("click", async () => {
       clearVideoStopTimer();
       try {
         setStatus("Uploading video recording...");
-        const blob = new Blob(videoChunks, { type: "video/webm" });
-        const videoDataUrl = await uploadCaptureBlob(blob, `${fileTitle()}-${Date.now()}.webm`, "video/webm");
+        const blob = new Blob(videoChunks, { type: "video/mp4" });
+        const videoDataUrl = await uploadCaptureBlob(blob, `${fileTitle()}-${Date.now()}.mp4`, "video/mp4");
         const stepNumber = steps.length + 1;
         const step = {
           id: crypto.randomUUID(),

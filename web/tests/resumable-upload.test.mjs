@@ -4,6 +4,7 @@ import {
   AUDIO_BITS_PER_SECOND,
   CAPTURE_FILE_SIZE_LIMIT_BYTES,
   MAX_VIDEO_DURATION_MS,
+  selectMp4RecordingMimeType,
   TUS_CHUNK_SIZE_BYTES,
   uploadBlobResumable,
   uploadHttpError,
@@ -18,6 +19,14 @@ test("10-minute recording bitrate budget stays below the 50 MiB limit", () => {
   const estimatedBytes =
     ((VIDEO_BITS_PER_SECOND + AUDIO_BITS_PER_SECOND) * MAX_VIDEO_DURATION_MS) / 8000;
   assert.ok(estimatedBytes < CAPTURE_FILE_SIZE_LIMIT_BYTES * 0.85);
+});
+
+test("the extension records only a browser-supported MP4 format", () => {
+  assert.equal(
+    selectMp4RecordingMimeType((type) => type === "video/mp4"),
+    "video/mp4"
+  );
+  assert.equal(selectMp4RecordingMimeType((type) => type.startsWith("video/webm")), null);
 });
 
 test("uploads a large recording in required 6 MiB TUS chunks", async () => {

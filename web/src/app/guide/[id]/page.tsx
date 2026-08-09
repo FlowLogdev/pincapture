@@ -368,8 +368,10 @@ function StepEditor({
   }, [step.id]);
 
   const mediaSrc = step.annotated_screenshot_url || step.screenshot_url;
-  const isVideo = step.type === "video" || mediaSrc?.startsWith("data:video/");
-  const downloadName = videoDownloadFileName(guideTitle, step.step_number);
+  const isVideo = step.type === "video"
+    || mediaSrc?.startsWith("data:video/")
+    || /\.(?:mp4|webm)(?:$|[?#])/i.test(mediaSrc || "");
+  const downloadName = videoDownloadFileName(guideTitle, step.step_number, mediaSrc || undefined);
   const downloadUrl = isVideo && mediaSrc
     ? videoDownloadUrl(mediaSrc, downloadName)
     : null;
