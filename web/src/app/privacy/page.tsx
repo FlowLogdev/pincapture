@@ -24,6 +24,8 @@ export default function PrivacyPage() {
           <BrandLogo size="app" />
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/terms" style={headerLinkStyle}>Terms</Link>
+          <Link href="/refund" style={headerLinkStyle}>Refunds</Link>
           <Link href="/support" style={headerLinkStyle}>Support</Link>
           <Link href="/login" style={primaryHeaderLinkStyle}>Sign in</Link>
         </nav>

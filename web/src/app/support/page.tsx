@@ -51,7 +51,9 @@ export default function SupportPage() {
           <BrandLogo size="app" />
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/terms" style={headerLinkStyle}>Terms</Link>
           <Link href="/privacy" style={headerLinkStyle}>Privacy</Link>
+          <Link href="/refund" style={headerLinkStyle}>Refunds</Link>
           <Link href="/login" style={primaryHeaderLinkStyle}>Sign in</Link>
         </nav>
       </header>

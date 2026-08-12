@@ -212,7 +212,9 @@ export default function Home() {
             <div className="footer-copy">Capture better documentation from the browser.</div>
           </div>
           <div className="footer-links">
+            <Link href="/terms">Terms</Link>
             <Link href="/privacy">Privacy</Link>
+            <Link href="/refund">Refunds</Link>
             <Link href="/support">Support</Link>
             <Link href="/docs">Docs</Link>
           </div>

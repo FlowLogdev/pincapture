@@ -228,6 +228,7 @@ export default function DashboardPage() {
           )}
           <Link href="/docs" style={docsButtonStyle}>DOCS</Link>
           <button onClick={manageBilling} style={docsButtonStyle}>BILLING</button>
+          <Link href="/refund" style={docsButtonStyle}>REFUND</Link>
           <button onClick={createGuide} disabled={creating} style={newGuideStyle}>
             {creating ? "Creating..." : "+ New guide"}
           </button>

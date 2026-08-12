@@ -25,6 +25,11 @@ async function syncSubscription(subscription: Stripe.Subscription) {
   const currentPeriodEnd = subscription.current_period_end
     ? new Date(subscription.current_period_end * 1000).toISOString()
     : null;
+  // start_date is stable for the life of the subscription (doesn't reset on
+  // renewal), so it's safe to always write — used for the 7-day refund window.
+  const subscriptionStartedAt = subscription.start_date
+    ? new Date(subscription.start_date * 1000).toISOString()
+    : null;
 
   await service
     .from("profiles")
@@ -33,6 +38,7 @@ async function syncSubscription(subscription: Stripe.Subscription) {
       subscription_id: subscription.id,
       plan,
       current_period_end: currentPeriodEnd,
+      subscription_started_at: subscriptionStartedAt,
     })
     .eq("stripe_customer_id", customerId);
 }

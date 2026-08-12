@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const requiresEntitlement = path.startsWith("/dashboard") || path.startsWith("/guide") || path.startsWith("/docs");
-  const isProtected = requiresEntitlement || path === "/billing";
+  const isProtected = requiresEntitlement || path === "/billing" || path === "/refund";
   const isAuthPage =
     path === "/login" ||
     path === "/register" ||
@@ -75,5 +75,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/guide/:path*", "/docs/:path*", "/login", "/register", "/check-email", "/billing"],
+  matcher: ["/", "/dashboard/:path*", "/guide/:path*", "/docs/:path*", "/login", "/register", "/check-email", "/billing", "/refund"],
 };
