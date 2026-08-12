@@ -130,7 +130,7 @@ function LoginForm() {
                 Sign in to PinCapture
               </h1>
               <p style={{ color: "var(--text-muted)", fontSize: 14, margin: 0 }}>
-                {mode === "magic" ? "We'll send a sign-in link to your email" : "Use your approved demo password"}
+                {mode === "magic" ? "We'll send a sign-in link to your email" : "Use your account password"}
               </p>
             </div>
 

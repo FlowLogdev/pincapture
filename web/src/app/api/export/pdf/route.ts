@@ -9,6 +9,8 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { requireEntitledUser } from "@/lib/require-entitlement";
+import { corsHeaders, withCors } from "@/lib/cors";
 
 type ExportStep = {
   stepNumber: number;
@@ -131,6 +133,9 @@ function PdfGuide({ title, steps }: { title: string; steps: ExportStep[] }) {
 }
 
 export async function POST(req: NextRequest) {
+  const gate = await requireEntitledUser();
+  if (!gate.ok) return withCors(req, gate.response);
+
   const { title, steps } = (await req.json()) as {
     title?: string;
     steps?: ExportStep[];
@@ -144,6 +149,11 @@ export async function POST(req: NextRequest) {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${safeTitle}.pdf"`,
+      ...corsHeaders(req),
     },
   });
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: corsHeaders(req) });
 }

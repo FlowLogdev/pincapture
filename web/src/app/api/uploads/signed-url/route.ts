@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { CAPTURE_FILE_SIZE_LIMIT_BYTES } from "@/lib/resumable-upload";
+import { checkEntitlement } from "@/lib/require-entitlement";
+import { corsHeaders } from "@/lib/cors";
 
 const BUCKET = "captures";
 const ALLOWED_CONTENT_TYPES = new Set(["video/mp4", "video/webm", "image/png", "image/jpeg"]);
@@ -33,6 +35,13 @@ export async function POST(req: NextRequest) {
     return corsResponse(req,
       { error: "Your session expired. Please sign in again." },
       401
+    );
+  }
+
+  if (!(await checkEntitlement(user.id, user.email))) {
+    return corsResponse(req,
+      { error: "Subscribe to continue using PinCapture." },
+      402
     );
   }
 
@@ -123,19 +132,5 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 function corsResponse(req: NextRequest, body: object | null, status = 200) {
-  const origin = req.headers.get("origin") || "";
-  const allowedOrigin = origin.startsWith("chrome-extension://")
-    ? origin
-    : process.env.NEXT_PUBLIC_APP_URL || "https://www.pincapturetool.com";
-
-  return NextResponse.json(body ?? {}, {
-    status,
-    headers: {
-      "Access-Control-Allow-Origin": allowedOrigin,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Credentials": "true",
-      "Vary": "Origin",
-    },
-  });
+  return NextResponse.json(body ?? {}, { status, headers: corsHeaders(req) });
 }

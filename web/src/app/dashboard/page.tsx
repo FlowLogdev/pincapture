@@ -189,6 +189,16 @@ export default function DashboardPage() {
     window.location.href = "/";
   }
 
+  async function manageBilling() {
+    const res = await fetch("/api/billing/portal", { method: "POST" });
+    const data = await res.json();
+    if (res.ok && data.url) {
+      window.location.href = data.url;
+    } else {
+      window.location.href = "/billing";
+    }
+  }
+
   const groupedGuides = useMemo(() => {
     return guides.reduce<Record<string, Guide[]>>((groups, guide) => {
       const key = guide.state_month || guide.archive_month || "Unsorted";
@@ -217,6 +227,7 @@ export default function DashboardPage() {
             </span>
           )}
           <Link href="/docs" style={docsButtonStyle}>DOCS</Link>
+          <button onClick={manageBilling} style={docsButtonStyle}>BILLING</button>
           <button onClick={createGuide} disabled={creating} style={newGuideStyle}>
             {creating ? "Creating..." : "+ New guide"}
           </button>

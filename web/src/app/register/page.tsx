@@ -8,13 +8,25 @@ import { BrandLogo } from "@/components/brand-logo";
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim()) return;
+    if (!fullName.trim() || !email.trim() || !password) return;
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -22,7 +34,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName: fullName.trim(), email: email.trim() }),
+      body: JSON.stringify({ fullName: fullName.trim(), email: email.trim(), password }),
     });
 
     const data = await res.json();
@@ -33,7 +45,7 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/pending-approval");
+    router.push("/check-email");
   }
 
   return (
@@ -66,10 +78,10 @@ export default function RegisterPage() {
             </span>
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-strong)", margin: "0 0 6px" }}>
-            Request access
+            Create your account
           </h1>
           <p style={{ color: "var(--text-muted)", fontSize: 14, margin: 0 }}>
-            Your request will be reviewed and approved by an admin
+            Start capturing and documenting your workflows in minutes
           </p>
         </div>
 
@@ -122,6 +134,56 @@ export default function RegisterPage() {
             />
           </div>
 
+          <div style={{ marginBottom: 16 }}>
+            <label style={{
+              display: "block", fontSize: 13, fontWeight: 600,
+              color: "var(--text)", marginBottom: 6,
+            }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+              required
+              minLength={8}
+              style={{
+                width: "100%", padding: "10px 13px",
+                borderRadius: 8, border: "1px solid var(--border-strong)",
+                fontSize: 14, outline: "none", boxSizing: "border-box",
+                fontFamily: "inherit",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+              onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
+            />
+          </div>
+
+          <div style={{ marginBottom: 22 }}>
+            <label style={{
+              display: "block", fontSize: 13, fontWeight: 600,
+              color: "var(--text)", marginBottom: 6,
+            }}>
+              Confirm password
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter your password"
+              required
+              minLength={8}
+              style={{
+                width: "100%", padding: "10px 13px",
+                borderRadius: 8, border: "1px solid var(--border-strong)",
+                fontSize: 14, outline: "none", boxSizing: "border-box",
+                fontFamily: "inherit",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+              onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
+            />
+          </div>
+
           {error && (
             <div style={{
               background: "var(--danger-soft)", border: "1px solid var(--danger)",
@@ -144,7 +206,7 @@ export default function RegisterPage() {
               fontFamily: "inherit", transition: "background 0.15s",
             }}
           >
-            {loading ? "Submitting…" : "Request access →"}
+            {loading ? "Creating account…" : "Create account →"}
           </button>
         </form>
 

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import PptxGenJS from "pptxgenjs";
+import { requireEntitledUser } from "@/lib/require-entitlement";
+import { corsHeaders, withCors } from "@/lib/cors";
 
 type ExportStep = {
   stepNumber: number;
@@ -17,6 +19,9 @@ const contentTypes: Record<string, string> = {
 };
 
 export async function createPresentationResponse(req: NextRequest, extension: "pptx" | "ppsx" | "pps") {
+  const gate = await requireEntitledUser();
+  if (!gate.ok) return withCors(req, gate.response);
+
   const { title, steps } = (await req.json()) as { title: string; steps: ExportStep[] };
 
   const pptx = new PptxGenJS();
@@ -140,6 +145,11 @@ export async function createPresentationResponse(req: NextRequest, extension: "p
     headers: {
       "Content-Type": contentTypes[extension],
       "Content-Disposition": `attachment; filename="${safeTitle}.${extension}"`,
+      ...corsHeaders(req),
     },
   });
+}
+
+export function presentationOptionsResponse(req: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: corsHeaders(req) });
 }

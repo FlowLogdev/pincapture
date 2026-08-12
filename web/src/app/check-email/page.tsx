@@ -21,14 +21,14 @@ export default function CheckEmailPage() {
         border: "1px solid var(--border)",
       }}>
         <div style={{ color: "var(--accent)", fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 14 }}>
-          SIGN-IN LINK SENT
+          CONFIRM YOUR EMAIL
         </div>
 
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-strong)", margin: "0 0 12px" }}>
           Check your inbox
         </h1>
         <p style={{ color: "var(--text-muted)", fontSize: 15, lineHeight: 1.65, margin: "0 0 26px" }}>
-          We've sent you a sign-in link. Click it to access PinCapture. The link expires in 1 hour.
+          We've sent a confirmation link to verify your account. Click it to activate PinCapture and choose a plan.
         </p>
 
         <div style={{

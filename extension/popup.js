@@ -89,6 +89,9 @@ saveBtn.addEventListener("click", async () => {
     setStatus("Import page opened.");
   } catch (error) {
     setStatus(error instanceof Error ? error.message : "Could not save guide.", true);
+    if (error && error.status === 402) {
+      chrome.tabs.create({ url: `${APP_URL}/billing` });
+    }
   }
 });
 
@@ -114,9 +117,16 @@ async function exportGuide(format) {
   try {
     const res = await fetch(`${APP_URL}/api/export/${format}`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(toExportPayload())
     });
+    if (res.status === 402) {
+      const data = await res.json().catch(() => ({}));
+      setStatus(data.error || "Subscribe to continue using PinCapture.", true);
+      chrome.tabs.create({ url: `${APP_URL}/billing` });
+      return;
+    }
     if (!res.ok) throw new Error(`Export failed with status ${res.status}.`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -340,7 +350,9 @@ async function uploadCaptureBlob(blob, fileName, contentType) {
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.error || "Sign in to PinCapture in the dashboard, then try again.");
+    const error = new Error(data.error || "Sign in to PinCapture in the dashboard, then try again.");
+    error.status = res.status;
+    throw error;
   }
 
   const form = new FormData();

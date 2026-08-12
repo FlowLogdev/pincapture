@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { checkEntitlement } from "@/lib/require-entitlement";
+import { corsHeaders } from "@/lib/cors";
 
 type ImportStep = {
   stepNumber?: number;
@@ -30,6 +32,10 @@ export async function POST(req: NextRequest) {
       { error: "Please sign in to PinCapture before saving from the extension." },
       401
     );
+  }
+
+  if (!(await checkEntitlement(user.id, user.email))) {
+    return corsResponse(req, { error: "Subscribe to continue using PinCapture." }, 402);
   }
 
   const { title, steps } = (await req.json()) as {
@@ -85,19 +91,5 @@ export async function POST(req: NextRequest) {
 }
 
 function corsResponse(req: NextRequest, body: object | null, status = 200) {
-  const origin = req.headers.get("origin") || "";
-  const allowedOrigin = origin.startsWith("chrome-extension://")
-    ? origin
-    : process.env.NEXT_PUBLIC_APP_URL || "https://www.pincapturetool.com";
-
-  return NextResponse.json(body ?? {}, {
-    status,
-    headers: {
-      "Access-Control-Allow-Origin": allowedOrigin,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Credentials": "true",
-      "Vary": "Origin",
-    },
-  });
+  return NextResponse.json(body ?? {}, { status, headers: corsHeaders(req) });
 }

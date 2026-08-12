@@ -54,7 +54,7 @@ export default function Home() {
 
           <div className="marketing-actions">
             <Link href="/login" className="nav-sign-in">Sign in</Link>
-            <Link href="/register" className="button-primary">Request access</Link>
+            <Link href="/register" className="button-primary">Get started</Link>
           </div>
         </div>
       </header>
@@ -69,7 +69,7 @@ export default function Home() {
                 Record your screen, capture every step, and publish clear guides or videos your team can reuse.
               </p>
               <div className="hero-actions">
-                <Link href="/register" className="button-primary">Request access</Link>
+                <Link href="/register" className="button-primary">Get started</Link>
                 <a href="#workflow" className="button-secondary">See how it works</a>
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function Home() {
         <section id="pricing" className="marketing-section pricing-section">
           <div className="marketing-container pricing-layout">
             <div className="pricing-intro">
-              <span className="section-eyebrow">Recommended launch pricing</span>
+              <span className="section-eyebrow">Simple pricing</span>
               <h2 className="section-heading">Simple pricing for work worth repeating.</h2>
               <p className="section-copy">
                 Start lean, prove the workflow, and expand when more people need to capture and share documentation.
@@ -170,7 +170,7 @@ export default function Home() {
                     <p>For one person documenting recurring work.</p>
                   </div>
                   <div className="pricing-price">
-                    <strong>$12</strong>
+                    <strong>$12.99</strong>
                     <span>per month</span>
                   </div>
                 </div>
@@ -182,8 +182,8 @@ export default function Home() {
                   <li>Video downloads, archive, and recovery</li>
                 </ul>
                 <div className="pricing-plan-footer">
-                  <span>$120 billed yearly</span>
-                  <Link href="/register" className="button-secondary">Request access</Link>
+                  <span>$129.99 billed yearly</span>
+                  <Link href="/register" className="button-secondary">Get started</Link>
                 </div>
               </article>
 
@@ -194,20 +194,20 @@ export default function Home() {
                     <p>For a small team standardizing how work gets done.</p>
                   </div>
                   <div className="pricing-price">
-                    <strong>$39</strong>
+                    <strong>$39.99</strong>
                     <span>per month</span>
                   </div>
                 </div>
                 <ul className="pricing-features">
-                  <li>Up to five approved user accounts</li>
+                  <li>Up to five user accounts</li>
                   <li>Everything in Solo</li>
-                  <li>Central access review</li>
+                  <li>Priority support</li>
                   <li>Guide and recording organization</li>
                   <li>Support ticket workflow</li>
                 </ul>
                 <div className="pricing-plan-footer">
-                  <span>$390 billed yearly</span>
-                  <Link href="/register" className="button-primary">Request access</Link>
+                  <span>$399.99 billed yearly</span>
+                  <Link href="/register" className="button-primary">Get started</Link>
                 </div>
               </article>
             </div>
@@ -229,8 +229,8 @@ export default function Home() {
               <p>PinCapture keeps capture, review, and distribution in one practical workspace.</p>
               <div className="trust-list">
                 <div className="trust-item">
-                  <strong>Controlled access</strong>
-                  <span>Account requests are reviewed before workspace access is approved.</span>
+                  <strong>Secure by default</strong>
+                  <span>Every account is protected by authentication and a verified subscription.</span>
                 </div>
                 <div className="trust-item">
                   <strong>Recoverable records</strong>
@@ -251,7 +251,7 @@ export default function Home() {
               <h2>Make every process easier to repeat.</h2>
               <p>Start building reusable team documentation directly from the work happening on screen.</p>
             </div>
-            <Link href="/register" className="button-primary">Request access</Link>
+            <Link href="/register" className="button-primary">Get started</Link>
           </div>
         </section>
       </main>

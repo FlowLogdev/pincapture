@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 
 type ImportMessage = {
@@ -15,6 +16,7 @@ type ImportMessage = {
 export default function ExtensionImportPage() {
   const [status, setStatus] = useState("Waiting for captured steps...");
   const [error, setError] = useState("");
+  const [needsSubscription, setNeedsSubscription] = useState(false);
 
   useEffect(() => {
     async function handleMessage(event: MessageEvent<ImportMessage>) {
@@ -53,6 +55,7 @@ export default function ExtensionImportPage() {
           ? await res.json()
           : { error: await res.text() };
         if (!res.ok) {
+          if (res.status === 402) setNeedsSubscription(true);
           throw new Error(data.error || "Could not save guide.");
         }
         setStatus("Saved. Opening editor...");
@@ -107,6 +110,14 @@ export default function ExtensionImportPage() {
             fontSize: 13,
           }}>
             {error}
+            {needsSubscription && (
+              <>
+                {" "}
+                <Link href="/billing" style={{ color: "inherit", fontWeight: 700 }}>
+                  Subscribe now →
+                </Link>
+              </>
+            )}
           </p>
         )}
       </section>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { checkEntitlement } from "@/lib/require-entitlement";
 
 const LEGACY_ARCHIVE_PREFIX = "[PinCapture archived at ";
 const STATUS_RE = /^\[PinCapture status=(archived|trashed|deleted) at ([^\]]+)\]\n?/;
@@ -138,6 +139,13 @@ export async function POST() {
     return NextResponse.json(
       { error: "Your session expired. Please sign in again." },
       { status: 401 }
+    );
+  }
+
+  if (!(await checkEntitlement(user.id, user.email))) {
+    return NextResponse.json(
+      { error: "Subscribe to continue using PinCapture." },
+      { status: 402 }
     );
   }
 

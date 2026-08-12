@@ -4,6 +4,8 @@ import {
   Document, Packer, Paragraph, TextRun, ImageRun,
   HeadingLevel,
 } from "docx";
+import { requireEntitledUser } from "@/lib/require-entitlement";
+import { corsHeaders, withCors } from "@/lib/cors";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -19,6 +21,9 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
 }
 
 export async function POST(req: NextRequest) {
+  const gate = await requireEntitledUser();
+  if (!gate.ok) return withCors(req, gate.response);
+
   const { title, steps } = await req.json();
 
   const children: any[] = [
@@ -105,6 +110,11 @@ export async function POST(req: NextRequest) {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "Content-Disposition": `attachment; filename="${encodeURIComponent(title)}.docx"`,
+      ...corsHeaders(req),
     },
   });
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: corsHeaders(req) });
 }
