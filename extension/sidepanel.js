@@ -8,7 +8,7 @@ import {
   VIDEO_BITS_PER_SECOND
 } from "./resumable-upload.mjs";
 
-const APP_URL = "https://pincapture.flowlog.dev";
+const APP_URL = "https://www.pincapturetool.com";
 
 let recording = false;
 let steps = [];

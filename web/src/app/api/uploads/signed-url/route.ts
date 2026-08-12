@@ -126,7 +126,7 @@ function corsResponse(req: NextRequest, body: object | null, status = 200) {
   const origin = req.headers.get("origin") || "";
   const allowedOrigin = origin.startsWith("chrome-extension://")
     ? origin
-    : process.env.NEXT_PUBLIC_APP_URL || "https://pincapture.flowlog.dev";
+    : process.env.NEXT_PUBLIC_APP_URL || "https://www.pincapturetool.com";
 
   return NextResponse.json(body ?? {}, {
     status,

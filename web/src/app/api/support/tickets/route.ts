@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const TICKET_PREFIX = "[PinCapture ticket]\n";
-const ADMIN_EMAILS = ["support@flowlog.dev", "fabio.almeida@pinvestcapital.com"];
+const ADMIN_EMAILS = ["support@flowlog.dev"];
 
 type TicketStatus = "submitted" | "review" | "working" | "updated" | "closed";
 

@@ -2,6 +2,7 @@
 
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase, type Guide } from "@/lib/supabase";
 import {
   AUDIO_BITS_PER_SECOND,
@@ -43,7 +44,7 @@ type Ticket = {
   messages: TicketMessage[];
 };
 
-const adminEmails = ["support@flowlog.dev", "fabio.almeida@pinvestcapital.com"];
+const adminEmails = ["support@flowlog.dev"];
 
 const viewLabels: Record<ViewMode, string> = {
   active: "Dashboard",
@@ -201,16 +202,17 @@ export default function DashboardPage() {
     .concat(isAdmin ? ["adminTickets"] : []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f6f7fb", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--page)", fontFamily: "var(--font-sans)" }}>
       <header style={headerStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/pinvest-logo.svg" alt="Pinvest" style={{ height: 20, filter: "brightness(0) invert(1)" }} />
-          <span style={productPillStyle}>PinCapture</span>
+          <Link href="/" aria-label="PinCapture home" style={{ display: "block" }}>
+            <BrandLogo size="app" />
+          </Link>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {userEmail && (
-            <span style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, fontWeight: 700 }}>
+            <span style={{ color: "var(--text-muted)", fontSize: 13, fontWeight: 700 }}>
               {greeting}, {firstNameFromUser(userName, userEmail)}
             </span>
           )}
@@ -222,9 +224,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main style={{ maxWidth: 1120, margin: "0 auto", padding: "36px 20px" }}>
+      <main style={{ maxWidth: 1240, margin: "0 auto", padding: "36px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 22, flexWrap: "wrap" }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#023465" }}>{viewLabels[view]}</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text-strong)" }}>{viewLabels[view]}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
             <button onClick={() => setCaptureMode("screenshots")} style={captureActionStyle}>
               Capture screenshot
@@ -232,17 +234,18 @@ export default function DashboardPage() {
             <button onClick={() => setCaptureMode("video")} style={captureSecondaryActionStyle}>
               Capture a video
             </button>
-            <div style={tabsStyle}>
-              {visibleTabs.map((mode) => (
-                <button key={mode} onClick={() => setView(mode)} style={tabButtonStyle(view === mode)}>
-                  {viewLabels[mode]}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
-        {loading && <p style={{ color: "#6b7280" }}>Loading...</p>}
+        <nav aria-label="Dashboard views" style={{ ...tabsStyle, marginBottom: 24 }}>
+          {visibleTabs.map((mode) => (
+            <button key={mode} onClick={() => setView(mode)} style={tabButtonStyle(view === mode)}>
+              {viewLabels[mode]}
+            </button>
+          ))}
+        </nav>
+
+        {loading && <p style={{ color: "var(--text-muted)" }}>Loading...</p>}
 
         {error && <div style={errorStyle}>{error}</div>}
 
@@ -279,7 +282,7 @@ export default function DashboardPage() {
 
         {view !== "active" && view !== "videos" && view !== "tickets" && view !== "adminTickets" && Object.entries(groupedGuides).map(([month, monthGuides]) => (
           <section key={month} style={{ marginBottom: 30 }}>
-            <h2 style={{ color: "#023465", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+            <h2 style={{ color: "var(--text-strong)", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
               {monthLabel(month)}
             </h2>
             <div style={gridStyle}>
@@ -532,8 +535,8 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
     <aside style={capturePanelStyle}>
       <div style={capturePanelHeaderStyle}>
         <div>
-          <div style={{ color: "#fff", fontSize: 18, fontWeight: 900 }}>PinCapture</div>
-          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 700 }}>
+          <div style={{ color: "var(--text-strong)", fontSize: 18, fontWeight: 900 }}>PinCapture</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700 }}>
             {mode === "video" ? "Video capture" : "Screenshot capture"}
           </div>
         </div>
@@ -593,8 +596,8 @@ function DashboardCapturePanel({ mode, onClose }: { mode: CaptureMode; onClose: 
                 <img src={step.screenshotDataUrl} alt={step.title} style={captureThumbStyle} />
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: "#023465", fontSize: 13, fontWeight: 900 }}>{step.title}</div>
-                <div style={{ color: "#64748b", fontSize: 11 }}>{step.type}</div>
+                <div style={{ color: "var(--text-strong)", fontSize: 13, fontWeight: 900 }}>{step.title}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{step.type}</div>
               </div>
             </div>
           ))}
@@ -641,9 +644,9 @@ function TicketList({
         <article key={ticket.ticketId} style={ticketCardStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
             <div>
-              <div style={{ color: "#64748b", fontSize: 12, fontWeight: 800 }}>{ticket.ticketId}</div>
-              <h2 style={{ margin: "4px 0 6px", color: "#023465", fontSize: 18 }}>{ticket.subject}</h2>
-              <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 800 }}>{ticket.ticketId}</div>
+              <h2 style={{ margin: "4px 0 6px", color: "var(--text-strong)", fontSize: 18 }}>{ticket.subject}</h2>
+              <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>
                 {admin ? `${ticket.requesterName} <${ticket.requesterEmail}>` : "Support team updates will appear here."}
               </p>
             </div>
@@ -651,7 +654,7 @@ function TicketList({
           </div>
 
           <div style={{ marginTop: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b", fontSize: 12, fontWeight: 800 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", color: "var(--text-muted)", fontSize: 12, fontWeight: 800 }}>
               <span>Progress</span>
               <span>{ticket.progress}%</span>
             </div>
@@ -663,11 +666,11 @@ function TicketList({
           <div style={messageListStyle}>
             {ticket.messages.map((message, index) => (
               <div key={`${ticket.ticketId}-${index}`} style={messageStyle(message.author)}>
-                <div style={{ fontSize: 12, color: "#64748b", fontWeight: 800, marginBottom: 4 }}>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 800, marginBottom: 4 }}>
                   {message.author === "admin" ? "Support" : message.author === "system" ? "System" : message.name}
                   {" "}· {formatRecordedAt(message.createdAt)}
                 </div>
-                <div style={{ color: "#0f172a", fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{message.message}</div>
+                <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{message.message}</div>
               </div>
             ))}
           </div>
@@ -731,25 +734,25 @@ function GuideCard({
         <div style={menuStyle}>
           {view === "active" && (
             <>
-              <button onClick={() => onAction(guide.id, "archive")} style={menuButtonStyle("#023465")}>Archive</button>
-              <button onClick={() => onAction(guide.id, "trash")} style={menuButtonStyle("#dc2626")}>Move to Trash</button>
+              <button onClick={() => onAction(guide.id, "archive")} style={menuButtonStyle("var(--text-strong)")}>Archive</button>
+              <button onClick={() => onAction(guide.id, "trash")} style={menuButtonStyle("var(--danger)")}>Move to Trash</button>
             </>
           )}
           {view === "archived" && (
             <>
-              <button onClick={() => onAction(guide.id, "restore")} style={menuButtonStyle("#023465")}>Restore</button>
-              <button onClick={() => onAction(guide.id, "trash")} style={menuButtonStyle("#dc2626")}>Move to Trash</button>
+              <button onClick={() => onAction(guide.id, "restore")} style={menuButtonStyle("var(--text-strong)")}>Restore</button>
+              <button onClick={() => onAction(guide.id, "trash")} style={menuButtonStyle("var(--danger)")}>Move to Trash</button>
             </>
           )}
           {view === "trashed" && (
             <>
-              <button onClick={() => onAction(guide.id, "recover")} style={menuButtonStyle("#023465")}>Recover</button>
-              <button onClick={() => onAction(guide.id, "archive")} style={menuButtonStyle("#023465")}>Archive</button>
-              <button onClick={() => onAction(guide.id, "permanentDelete")} style={menuButtonStyle("#dc2626")}>Permanent Delete</button>
+              <button onClick={() => onAction(guide.id, "recover")} style={menuButtonStyle("var(--text-strong)")}>Recover</button>
+              <button onClick={() => onAction(guide.id, "archive")} style={menuButtonStyle("var(--text-strong)")}>Archive</button>
+              <button onClick={() => onAction(guide.id, "permanentDelete")} style={menuButtonStyle("var(--danger)")}>Permanent Delete</button>
             </>
           )}
           {view === "deleted" && (
-            <button onClick={() => onAction(guide.id, "recover")} style={menuButtonStyle("#023465")}>Recover</button>
+            <button onClick={() => onAction(guide.id, "recover")} style={menuButtonStyle("var(--text-strong)")}>Recover</button>
           )}
         </div>
       )}
@@ -759,14 +762,14 @@ function GuideCard({
       </div>
       <div style={{ padding: "12px 16px", flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: "#023465" }}>{guide.title}</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text-strong)" }}>{guide.title}</div>
           {guide.has_video && (
             <span style={videoPillStyle}>
               {guide.video_count || 1} video{(guide.video_count || 1) !== 1 ? "s" : ""}
             </span>
           )}
         </div>
-        <div style={{ color: "#475569", fontSize: 13, lineHeight: 1.55 }}>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.55 }}>
           {guide.step_count} step{guide.step_count !== 1 ? "s" : ""}
           <br />
           Last recorded: {formatRecordedAt(guide.last_recorded_at || guide.updated_at)}
@@ -888,7 +891,8 @@ function safeFileName(value: string) {
 }
 
 const headerStyle: CSSProperties = {
-  background: "#023465",
+  background: "var(--surface)",
+  borderBottom: "1px solid var(--border)",
   padding: "0 28px",
   minHeight: 56,
   display: "flex",
@@ -898,18 +902,9 @@ const headerStyle: CSSProperties = {
   flexWrap: "wrap",
 };
 
-const productPillStyle: CSSProperties = {
-  background: "rgba(255,221,0,0.15)",
-  color: "#FFDD00",
-  fontSize: 11,
-  fontWeight: 700,
-  padding: "2px 8px",
-  borderRadius: 4,
-};
-
 const docsButtonStyle: CSSProperties = {
-  background: "#fff",
-  color: "#023465",
+  background: "var(--surface-2)",
+  color: "var(--text-strong)",
   textDecoration: "none",
   borderRadius: 7,
   padding: "7px 13px",
@@ -918,8 +913,8 @@ const docsButtonStyle: CSSProperties = {
 };
 
 const newGuideStyle: CSSProperties = {
-  background: "#FFDD00",
-  color: "#023465",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
   border: "none",
   borderRadius: 7,
   padding: "7px 16px",
@@ -929,8 +924,8 @@ const newGuideStyle: CSSProperties = {
 };
 
 const captureActionStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: "none",
   borderRadius: 7,
   padding: "9px 14px",
@@ -940,9 +935,9 @@ const captureActionStyle: CSSProperties = {
 };
 
 const captureSecondaryActionStyle: CSSProperties = {
-  background: "#fff",
-  color: "#023465",
-  border: "1px solid #cbd5e1",
+  background: "var(--surface)",
+  color: "var(--text-strong)",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "8px 14px",
   fontWeight: 800,
@@ -957,14 +952,15 @@ const capturePanelStyle: CSSProperties = {
   bottom: 0,
   zIndex: 40,
   width: "min(430px, 100vw)",
-  background: "#f8fafc",
-  borderLeft: "1px solid #cbd5e1",
+  background: "var(--surface)",
+  borderLeft: "1px solid var(--border-strong)",
   boxShadow: "-16px 0 38px rgba(15,23,42,0.2)",
   overflowY: "auto",
 };
 
 const capturePanelHeaderStyle: CSSProperties = {
-  background: "#023465",
+  background: "var(--surface)",
+  borderBottom: "1px solid var(--border)",
   padding: "16px 18px",
   display: "flex",
   justifyContent: "space-between",
@@ -976,9 +972,9 @@ const captureCloseStyle: CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: 6,
-  border: "1px solid rgba(255,255,255,0.25)",
-  background: "rgba(255,255,255,0.08)",
-  color: "#fff",
+  border: "1px solid var(--border-strong)",
+  background: "var(--surface-2)",
+  color: "var(--text-strong)",
   fontSize: 18,
   fontWeight: 800,
   cursor: "pointer",
@@ -987,16 +983,16 @@ const captureCloseStyle: CSSProperties = {
 const captureLabelStyle: CSSProperties = {
   display: "grid",
   gap: 6,
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 12,
   fontWeight: 900,
 };
 
 const captureInputStyle: CSSProperties = {
-  border: "1px solid #cbd5e1",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "10px 11px",
-  color: "#0f172a",
+  color: "var(--text)",
   font: "inherit",
   fontSize: 14,
 };
@@ -1004,15 +1000,15 @@ const captureInputStyle: CSSProperties = {
 const capturePreviewStyle: CSSProperties = {
   width: "100%",
   aspectRatio: "16 / 10",
-  background: "#0f172a",
-  border: "1px solid #cbd5e1",
+  background: "var(--text)",
+  border: "1px solid var(--border-strong)",
   borderRadius: 8,
   objectFit: "contain",
 };
 
 const capturePrimaryButtonStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: "none",
   borderRadius: 7,
   padding: "11px 14px",
@@ -1022,12 +1018,12 @@ const capturePrimaryButtonStyle: CSSProperties = {
 
 const captureDangerButtonStyle: CSSProperties = {
   ...capturePrimaryButtonStyle,
-  background: "#dc2626",
+  background: "var(--danger)",
 };
 
 const captureSaveButtonStyle: CSSProperties = {
-  background: "#FFDD00",
-  color: "#023465",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
   border: "none",
   borderRadius: 7,
   padding: "12px 14px",
@@ -1036,9 +1032,9 @@ const captureSaveButtonStyle: CSSProperties = {
 };
 
 const captureStatusStyle: CSSProperties = {
-  background: "#eef6ff",
-  border: "1px solid #bfdbfe",
-  color: "#075985",
+  background: "var(--accent-soft)",
+  border: "1px solid var(--border-strong)",
+  color: "var(--accent-hover)",
   borderRadius: 7,
   padding: "9px 10px",
   fontSize: 12,
@@ -1046,9 +1042,9 @@ const captureStatusStyle: CSSProperties = {
 };
 
 const captureErrorStyle: CSSProperties = {
-  background: "#fef2f2",
-  border: "1px solid #fca5a5",
-  color: "#dc2626",
+  background: "var(--danger-soft)",
+  border: "1px solid var(--danger)",
+  color: "var(--danger)",
   borderRadius: 7,
   padding: "9px 10px",
   fontSize: 12,
@@ -1059,7 +1055,7 @@ const captureListHeaderStyle: CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 13,
   fontWeight: 900,
 };
@@ -1072,10 +1068,10 @@ const captureListStyle: CSSProperties = {
 };
 
 const captureEmptyStyle: CSSProperties = {
-  border: "1px dashed #cbd5e1",
+  border: "1px dashed var(--border-strong)",
   borderRadius: 8,
   padding: "24px 16px",
-  color: "#64748b",
+  color: "var(--text-muted)",
   textAlign: "center",
   fontSize: 12,
   lineHeight: 1.6,
@@ -1085,8 +1081,8 @@ const captureItemStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 10,
-  background: "#fff",
-  border: "1px solid #dbe2ee",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 8,
 };
@@ -1095,8 +1091,8 @@ const captureItemNumberStyle: CSSProperties = {
   width: 24,
   height: 24,
   borderRadius: 999,
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -1109,14 +1105,14 @@ const captureThumbStyle: CSSProperties = {
   height: 58,
   objectFit: "cover",
   borderRadius: 6,
-  border: "1px solid #e2e8f0",
-  background: "#0f172a",
+  border: "1px solid var(--border)",
+  background: "var(--text)",
 };
 
 const signOutStyle: CSSProperties = {
   background: "none",
-  color: "rgba(255,255,255,0.55)",
-  border: "1px solid rgba(255,255,255,0.2)",
+  color: "var(--text-muted)",
+  border: "1px solid var(--border)",
   borderRadius: 6,
   padding: "6px 12px",
   fontSize: 12,
@@ -1125,10 +1121,10 @@ const signOutStyle: CSSProperties = {
 
 const tabsStyle: CSSProperties = {
   display: "flex",
-  border: "1px solid #dbe2ee",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   overflow: "hidden",
-  background: "#fff",
+  background: "var(--surface)",
   flexWrap: "wrap",
 };
 
@@ -1137,8 +1133,8 @@ function tabButtonStyle(active: boolean): CSSProperties {
     border: 0,
     padding: "8px 13px",
     cursor: "pointer",
-    background: active ? "#023465" : "#fff",
-    color: active ? "#fff" : "#023465",
+    background: active ? "var(--surface-inverse)" : "var(--surface)",
+    color: active ? "var(--text-inverse)" : "var(--text-strong)",
     fontWeight: 700,
     fontSize: 13,
   };
@@ -1151,8 +1147,8 @@ const gridStyle: CSSProperties = {
 };
 
 const ticketCardStyle: CSSProperties = {
-  background: "#fff",
-  border: "1px solid #dbe2ee",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 18,
   boxShadow: "0 8px 20px rgba(15,23,42,0.04)",
@@ -1162,8 +1158,8 @@ function statusPillStyle(status: TicketStatus): CSSProperties {
   const closed = status === "closed";
   return {
     alignSelf: "flex-start",
-    background: closed ? "#dcfce7" : "#e0f2fe",
-    color: closed ? "#166534" : "#075985",
+    background: closed ? "var(--success-soft)" : "var(--accent-soft)",
+    color: closed ? "var(--success)" : "var(--accent-hover)",
     borderRadius: 999,
     padding: "7px 11px",
     fontSize: 12,
@@ -1173,7 +1169,7 @@ function statusPillStyle(status: TicketStatus): CSSProperties {
 
 const progressTrackStyle: CSSProperties = {
   height: 12,
-  background: "#e2e8f0",
+  background: "var(--border)",
   borderRadius: 999,
   overflow: "hidden",
   marginTop: 7,
@@ -1181,7 +1177,7 @@ const progressTrackStyle: CSSProperties = {
 
 const progressFillStyle: CSSProperties = {
   height: "100%",
-  background: "#22c55e",
+  background: "var(--success)",
   borderRadius: 999,
 };
 
@@ -1193,10 +1189,10 @@ const messageListStyle: CSSProperties = {
 
 function messageStyle(author: TicketMessage["author"]): CSSProperties {
   return {
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--border)",
     borderRadius: 8,
     padding: 12,
-    background: author === "admin" ? "#f0f9ff" : author === "system" ? "#f8fafc" : "#fff",
+    background: author === "admin" ? "var(--accent-soft)" : author === "system" ? "var(--surface)" : "var(--surface)",
   };
 }
 
@@ -1205,40 +1201,40 @@ const adminPanelStyle: CSSProperties = {
   gap: 10,
   marginTop: 16,
   padding: 14,
-  background: "#f8fafc",
-  border: "1px solid #e2e8f0",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
 };
 
 const adminLabelStyle: CSSProperties = {
   display: "grid",
   gap: 6,
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 13,
   fontWeight: 800,
 };
 
 const selectStyle: CSSProperties = {
-  border: "1px solid #cbd5e1",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "10px 11px",
   font: "inherit",
-  color: "#0f172a",
+  color: "var(--text)",
 };
 
 const textareaStyle: CSSProperties = {
-  border: "1px solid #cbd5e1",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "10px 11px",
   font: "inherit",
-  color: "#0f172a",
+  color: "var(--text)",
   resize: "vertical",
   lineHeight: 1.5,
 };
 
 const ticketButtonStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: "none",
   borderRadius: 7,
   padding: "10px 14px",
@@ -1247,8 +1243,8 @@ const ticketButtonStyle: CSSProperties = {
 };
 
 const cardStyle: CSSProperties = {
-  background: "#fff",
-  border: "1px solid #e2e5ef",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   overflow: "hidden",
   display: "flex",
@@ -1263,9 +1259,9 @@ const cardMenuButtonStyle: CSSProperties = {
   width: 30,
   height: 30,
   borderRadius: 6,
-  border: "1px solid rgba(2,52,101,0.16)",
-  background: "rgba(255,255,255,0.94)",
-  color: "#023465",
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text-strong)",
   fontSize: 18,
   fontWeight: 800,
   cursor: "pointer",
@@ -1278,8 +1274,8 @@ const menuStyle: CSSProperties = {
   top: 44,
   zIndex: 2,
   width: 170,
-  background: "#fff",
-  border: "1px solid #dbe2ee",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 7,
   boxShadow: "0 10px 24px rgba(15,23,42,0.14)",
   padding: 6,
@@ -1301,25 +1297,25 @@ function menuButtonStyle(color: string): CSSProperties {
 
 const cardThumbStyle: CSSProperties = {
   height: 120,
-  background: "linear-gradient(135deg, #e8eeff 0%, #f0f4ff 100%)",
+  background: "var(--surface-2)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 15,
   fontWeight: 800,
 };
 
 const videoCardThumbStyle: CSSProperties = {
   ...cardThumbStyle,
-  background: "linear-gradient(135deg, #023465 0%, #0f766e 100%)",
-  color: "#fff",
+  background: "var(--surface-3)",
+  color: "var(--text-strong)",
   fontSize: 16,
 };
 
 const videoPillStyle: CSSProperties = {
-  background: "#dcfce7",
-  color: "#166534",
+  background: "var(--success-soft)",
+  color: "var(--success)",
   borderRadius: 999,
   padding: "3px 8px",
   fontSize: 11,
@@ -1331,8 +1327,8 @@ const openButtonStyle: CSSProperties = {
   flex: 1,
   textAlign: "center",
   padding: "8px 0",
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   borderRadius: 7,
   fontSize: 13,
   fontWeight: 700,
@@ -1343,19 +1339,19 @@ const cardActionsStyle: CSSProperties = {
   display: "flex",
   gap: 8,
   padding: "10px 16px",
-  borderTop: "1px solid #e2e5ef",
+  borderTop: "1px solid var(--border)",
 };
 
 const downloadButtonStyle: CSSProperties = {
   ...openButtonStyle,
-  background: "#FFDD00",
-  color: "#023465",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
 };
 
 const errorStyle: CSSProperties = {
-  background: "#fef2f2",
-  border: "1px solid #fca5a5",
-  color: "#dc2626",
+  background: "var(--danger-soft)",
+  border: "1px solid var(--danger)",
+  color: "var(--danger)",
   borderRadius: 8,
   padding: "10px 14px",
   fontSize: 13,
@@ -1365,14 +1361,14 @@ const errorStyle: CSSProperties = {
 const emptyStyle: CSSProperties = {
   textAlign: "center",
   padding: "68px 0",
-  color: "#9ca3af",
+  color: "var(--text-faint)",
   fontSize: 14,
   lineHeight: 1.8,
 };
 
 const emptyButtonStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: "none",
   borderRadius: 8,
   padding: "10px 22px",
@@ -1383,8 +1379,8 @@ const emptyButtonStyle: CSSProperties = {
 
 const emptyLinkStyle: CSSProperties = {
   display: "inline-block",
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   borderRadius: 8,
   padding: "10px 18px",
   fontWeight: 800,

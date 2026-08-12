@@ -2,6 +2,7 @@
 
 import { type CSSProperties, type FormEvent, type ReactNode, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function DocsPage() {
   const [email, setEmail] = useState("");
@@ -34,27 +35,25 @@ export default function DocsPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f6f7fb", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a" }}>
+    <main style={{ minHeight: "100vh", background: "var(--page)", fontFamily: "var(--font-sans)", color: "var(--text)" }}>
       <header style={{
-        background: "#023465",
+        background: "var(--surface)",
+        borderBottom: "1px solid var(--border)",
         height: 56,
         padding: "0 28px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
       }}>
-        <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="/pinvest-logo.svg" alt="Pinvest" style={{ height: 20, filter: "brightness(0) invert(1)" }} />
-          <span style={{ background: "rgba(255,221,0,0.15)", color: "#FFDD00", fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 4 }}>
-            PinCapture
-          </span>
+        <Link href="/dashboard" aria-label="PinCapture dashboard" style={{ display: "block" }}>
+          <BrandLogo size="app" />
         </Link>
         <Link href="/dashboard" style={headerLink}>Dashboard</Link>
       </header>
 
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "34px 22px 64px" }}>
-        <h1 style={{ color: "#023465", fontSize: 28, margin: "0 0 8px" }}>PinCapture Docs</h1>
-        <p style={{ color: "#475569", margin: "0 0 26px", fontSize: 15 }}>
+        <h1 style={{ color: "var(--text-strong)", fontSize: 28, margin: "0 0 8px" }}>PinCapture Docs</h1>
+        <p style={{ color: "var(--text-muted)", margin: "0 0 26px", fontSize: 15 }}>
           Technical operating instructions for capturing, saving, exporting, archiving, and recovering PinCapture guides.
         </p>
 
@@ -89,14 +88,14 @@ export default function DocsPage() {
             </DocSection>
 
             <DocSection title="8. Record and save video">
-              Click <strong>Start video</strong> in the right-side panel, choose the tab, window, or screen to share, and click <strong>Stop video</strong> when finished. PinCapture optimizes recordings for a maximum of 10 minutes and uploads larger files in resumable chunks with progress shown in the panel. When the upload finishes, click <strong>Finish and save to dashboard</strong>. Use <strong>Download</strong> on a saved video card or beside an opened video to save the WebM file to your computer.
+              Click <strong>Start video</strong> in the right-side panel, choose the tab, window, or screen to share, and click <strong>Stop video</strong> when finished. PinCapture optimizes recordings for a maximum of 10 minutes and uploads larger files in resumable chunks with progress shown in the panel. When the upload finishes, click <strong>Finish and save to dashboard</strong>. Use <strong>Download</strong> on a saved video card or beside an opened video to save the MP4 file to your computer.
             </DocSection>
           </section>
 
           <aside style={panelStyle}>
-            <h2 style={{ color: "#023465", fontSize: 20, margin: "0 0 8px" }}>Open a support ticket</h2>
-            <p style={{ color: "#64748b", lineHeight: 1.6, fontSize: 14, margin: "0 0 16px" }}>
-              A ticket copy is sent to the requester, support@flowlog.dev, and fabio.almeida@pinvestcapital.com.
+            <h2 style={{ color: "var(--text-strong)", fontSize: 20, margin: "0 0 8px" }}>Open a support ticket</h2>
+            <p style={{ color: "var(--text-muted)", lineHeight: 1.6, fontSize: 14, margin: "0 0 16px" }}>
+              A ticket copy is sent to the requester and support@flowlog.dev.
             </p>
             <form onSubmit={submitTicket} style={{ display: "grid", gap: 10 }}>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" style={inputStyle} />
@@ -107,7 +106,7 @@ export default function DocsPage() {
                 {sending ? "Creating ticket..." : "Create support ticket"}
               </button>
             </form>
-            {status && <p style={{ margin: "12px 0 0", color: status.includes("created") ? "#166534" : "#dc2626", fontSize: 13, lineHeight: 1.5 }}>{status}</p>}
+            {status && <p style={{ margin: "12px 0 0", color: status.includes("created") ? "var(--success)" : "var(--danger)", fontSize: 13, lineHeight: 1.5 }}>{status}</p>}
           </aside>
         </div>
       </div>
@@ -118,22 +117,22 @@ export default function DocsPage() {
 function DocSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section style={{ marginBottom: 22 }}>
-      <h2 style={{ color: "#023465", fontSize: 18, margin: "0 0 8px" }}>{title}</h2>
-      <p style={{ color: "#475569", fontSize: 15, lineHeight: 1.75, margin: 0 }}>{children}</p>
+      <h2 style={{ color: "var(--text-strong)", fontSize: 18, margin: "0 0 8px" }}>{title}</h2>
+      <p style={{ color: "var(--text-muted)", fontSize: 15, lineHeight: 1.75, margin: 0 }}>{children}</p>
     </section>
   );
 }
 
 const panelStyle: CSSProperties = {
-  background: "#fff",
-  border: "1px solid #dbe3ef",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 24,
 };
 
 const inputStyle: CSSProperties = {
   width: "100%",
-  border: "1px solid #cbd5e1",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "10px 11px",
   font: "inherit",
@@ -141,8 +140,8 @@ const inputStyle: CSSProperties = {
 };
 
 const buttonStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: 0,
   borderRadius: 7,
   padding: "11px 14px",
@@ -151,8 +150,8 @@ const buttonStyle: CSSProperties = {
 };
 
 const headerLink: CSSProperties = {
-  color: "#023465",
-  background: "#ffdd00",
+  color: "var(--on-accent)",
+  background: "var(--accent)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 800,

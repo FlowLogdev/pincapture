@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -37,35 +38,37 @@ export default function RegisterPage() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#f0f4f8",
+      minHeight: "100vh", background: "var(--page)",
       display: "flex", flexDirection: "column", alignItems: "center",
       justifyContent: "center", padding: 24,
-      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-sans)",
     }}>
       <div style={{ marginBottom: 32 }}>
-        <img src="/pinvest-logo.svg" alt="Pinvest" style={{ height: 28 }} />
+        <Link href="/" aria-label="PinCapture home" style={{ display: "block" }}>
+          <BrandLogo size="auth" />
+        </Link>
       </div>
 
       <div style={{
-        background: "#fff", borderRadius: 14,
+        background: "var(--surface)", borderRadius: 14,
         padding: "42px 38px", width: "100%", maxWidth: 420,
-        boxShadow: "0 4px 24px rgba(2,52,101,0.09)",
-        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 24px rgb(20 23 26 / 0.07)",
+        border: "1px solid var(--border)",
       }}>
         {/* Card header */}
         <div style={{ textAlign: "center", marginBottom: 30 }}>
           <div style={{
-            display: "inline-flex", background: "#023465",
+            display: "inline-flex", background: "var(--text-strong)",
             borderRadius: 8, padding: "5px 14px", marginBottom: 18,
           }}>
-            <span style={{ color: "#FFDD00", fontWeight: 700, fontSize: 13, letterSpacing: 0.3 }}>
+            <span style={{ color: "var(--accent)", fontWeight: 700, fontSize: 13, letterSpacing: 0.3 }}>
               PinCapture
             </span>
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: "#023465", margin: "0 0 6px" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-strong)", margin: "0 0 6px" }}>
             Request access
           </h1>
-          <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 14, margin: 0 }}>
             Your request will be reviewed and approved by an admin
           </p>
         </div>
@@ -74,7 +77,7 @@ export default function RegisterPage() {
           <div style={{ marginBottom: 16 }}>
             <label style={{
               display: "block", fontSize: 13, fontWeight: 600,
-              color: "#374151", marginBottom: 6,
+              color: "var(--text)", marginBottom: 6,
             }}>
               Full name
             </label>
@@ -82,23 +85,23 @@ export default function RegisterPage() {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="John Smith"
+              placeholder="Alex Morgan"
               required
               style={{
                 width: "100%", padding: "10px 13px",
-                borderRadius: 8, border: "1px solid #d1d5db",
+                borderRadius: 8, border: "1px solid var(--border-strong)",
                 fontSize: 14, outline: "none", boxSizing: "border-box",
-                fontFamily: "system-ui",
+                fontFamily: "inherit",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#023465")}
-              onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+              onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+              onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
             />
           </div>
 
           <div style={{ marginBottom: 22 }}>
             <label style={{
               display: "block", fontSize: 13, fontWeight: 600,
-              color: "#374151", marginBottom: 6,
+              color: "var(--text)", marginBottom: 6,
             }}>
               Work email
             </label>
@@ -106,24 +109,24 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@pinvestcapital.com"
+              placeholder="you@company.com"
               required
               style={{
                 width: "100%", padding: "10px 13px",
-                borderRadius: 8, border: "1px solid #d1d5db",
+                borderRadius: 8, border: "1px solid var(--border-strong)",
                 fontSize: 14, outline: "none", boxSizing: "border-box",
-                fontFamily: "system-ui",
+                fontFamily: "inherit",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#023465")}
-              onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+              onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+              onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
             />
           </div>
 
           {error && (
             <div style={{
-              background: "#fef2f2", border: "1px solid #fca5a5",
+              background: "var(--danger-soft)", border: "1px solid var(--danger)",
               borderRadius: 8, padding: "10px 14px",
-              marginBottom: 16, fontSize: 13, color: "#dc2626",
+              marginBottom: 16, fontSize: 13, color: "var(--danger)",
             }}>
               {error}
             </div>
@@ -134,27 +137,27 @@ export default function RegisterPage() {
             disabled={loading}
             style={{
               width: "100%", padding: "12px",
-              background: loading ? "#4b7abf" : "#023465",
-              color: "#fff", border: "none", borderRadius: 8,
+              background: loading ? "var(--accent-hover)" : "var(--text-strong)",
+              color: "var(--surface)", border: "none", borderRadius: 8,
               fontSize: 15, fontWeight: 700,
               cursor: loading ? "not-allowed" : "pointer",
-              fontFamily: "system-ui", transition: "background 0.15s",
+              fontFamily: "inherit", transition: "background 0.15s",
             }}
           >
             {loading ? "Submitting…" : "Request access →"}
           </button>
         </form>
 
-        <p style={{ textAlign: "center", fontSize: 13, color: "#9ca3af", marginTop: 22, marginBottom: 0 }}>
+        <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-faint)", marginTop: 22, marginBottom: 0 }}>
           Already have an account?{" "}
-          <Link href="/login" style={{ color: "#023465", fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/login" style={{ color: "var(--text-strong)", fontWeight: 600, textDecoration: "none" }}>
             Sign in
           </Link>
         </p>
       </div>
 
-      <p style={{ marginTop: 28, fontSize: 12, color: "#9ca3af" }}>
-        © 2026 Pinvest LLC
+      <p style={{ marginTop: 28, fontSize: 12, color: "var(--text-faint)" }}>
+        © 2026 PinCapture
       </p>
     </div>
   );

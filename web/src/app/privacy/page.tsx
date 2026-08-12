@@ -1,16 +1,18 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function PrivacyPage() {
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#f6f7fb",
-      color: "#0f172a",
-      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      background: "var(--page)",
+      color: "var(--text)",
+      fontFamily: "var(--font-sans)",
     }}>
       <header style={{
         minHeight: 64,
-        background: "#023465",
+        background: "var(--surface)",
+        borderBottom: "1px solid var(--border)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -18,22 +20,8 @@ export default function PrivacyPage() {
         padding: "0 28px",
         flexWrap: "wrap",
       }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img
-            src="/pinvest-logo.svg"
-            alt="Pinvest"
-            style={{ height: 22, filter: "brightness(0) invert(1)" }}
-          />
-          <span style={{
-            background: "rgba(255,221,0,0.16)",
-            color: "#ffdd00",
-            borderRadius: 5,
-            padding: "3px 9px",
-            fontSize: 11,
-            fontWeight: 800,
-          }}>
-            PinCapture
-          </span>
+        <Link href="/" aria-label="PinCapture home" style={{ display: "block" }}>
+          <BrandLogo size="app" />
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Link href="/support" style={headerLinkStyle}>Support</Link>
@@ -50,7 +38,7 @@ export default function PrivacyPage() {
         <h1 style={titleStyle}>PinCapture Privacy Policy</h1>
         <p style={introStyle}>
           This privacy policy applies to the PinCapture Chrome extension and
-          PinCapture web dashboard at pincapture.flowlog.dev.
+          PinCapture web dashboard at pincapturetool.com.
         </p>
 
         <div style={panelStyle}>
@@ -139,7 +127,7 @@ export default function PrivacyPage() {
             workspace needs them. Users can move guides to Trash, recover them,
             archive them, or mark them for deletion from the dashboard. To
             request deletion of account data, saved guide data, or support
-            ticket data, contact fabio.almeida@pinvestcapital.com.
+            ticket data, contact support@flowlog.dev.
           </PolicySection>
 
           <PolicySection title="Children">
@@ -156,10 +144,10 @@ export default function PrivacyPage() {
 
           <PolicySection title="Contact">
             For privacy questions, data deletion requests, or Chrome Web Store
-            privacy review questions, contact fabio.almeida@pinvestcapital.com.
+            privacy review questions, contact support@flowlog.dev.
           </PolicySection>
 
-          <p style={{ margin: "28px 0 0", color: "#94a3b8", fontSize: 13 }}>
+          <p style={{ margin: "28px 0 0", color: "var(--text-faint)", fontSize: 13 }}>
             Effective date: May 24, 2026
           </p>
         </div>
@@ -181,10 +169,10 @@ function PolicySection({
 }) {
   return (
     <section style={{ marginBottom: 22 }}>
-      <h2 style={{ margin: "0 0 7px", color: "#023465", fontSize: 18 }}>
+      <h2 style={{ margin: "0 0 7px", color: "var(--text-strong)", fontSize: 18 }}>
         {title}
       </h2>
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 15 }}>
+      <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.7, fontSize: 15 }}>
         {children}
       </p>
     </section>
@@ -192,7 +180,7 @@ function PolicySection({
 }
 
 const headerLinkStyle = {
-  color: "rgba(255,255,255,0.78)",
+  color: "var(--text-muted)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 700,
@@ -200,8 +188,8 @@ const headerLinkStyle = {
 };
 
 const primaryHeaderLinkStyle = {
-  color: "#023465",
-  background: "#ffdd00",
+  color: "var(--on-accent)",
+  background: "var(--accent)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 800,
@@ -211,7 +199,7 @@ const primaryHeaderLinkStyle = {
 
 const eyebrowStyle = {
   margin: "0 0 8px",
-  color: "#64748b",
+  color: "var(--text-muted)",
   fontSize: 12,
   fontWeight: 800,
   textTransform: "uppercase" as const,
@@ -220,7 +208,7 @@ const eyebrowStyle = {
 
 const titleStyle = {
   margin: "0 0 18px",
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 36,
   lineHeight: 1.15,
   letterSpacing: 0,
@@ -228,14 +216,14 @@ const titleStyle = {
 
 const introStyle = {
   margin: "0 0 24px",
-  color: "#475569",
+  color: "var(--text-muted)",
   lineHeight: 1.7,
   fontSize: 16,
 };
 
 const panelStyle = {
-  background: "#fff",
-  border: "1px solid #dbe3ef",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 28,
   boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
@@ -244,6 +232,6 @@ const panelStyle = {
 const footerStyle = {
   padding: "0 24px 34px",
   textAlign: "center" as const,
-  color: "#94a3b8",
+  color: "var(--text-faint)",
   fontSize: 13,
 };

@@ -110,7 +110,7 @@ export default function GuidePage({ params }: { params: Params }) {
   if (loading) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-        <span style={{ color: "#6b7280" }}>Loading…</span>
+        <span style={{ color: "var(--text-muted)" }}>Loading…</span>
       </div>
     );
   }
@@ -125,20 +125,22 @@ export default function GuidePage({ params }: { params: Params }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#f6f7fb" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--page)" }}>
       {/* Top bar */}
       <header
+        className="guide-header"
         style={{
-          background: "#1a6bff",
-          padding: "0 20px",
-          height: 52,
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
+          padding: "10px 20px",
+          minHeight: 60,
           display: "flex",
           alignItems: "center",
           gap: 14,
           flexShrink: 0,
         }}
       >
-        <Link href="/" style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>
+        <Link href="/dashboard" style={{ color: "var(--text-muted)", fontSize: 13, textDecoration: "none" }}>
           ← Guides
         </Link>
 
@@ -152,10 +154,10 @@ export default function GuidePage({ params }: { params: Params }) {
             autoFocus
             style={{
               flex: 1,
-              background: "rgba(255,255,255,0.15)",
-              border: "1px solid rgba(255,255,255,0.3)",
+              background: "var(--surface-2)",
+              border: "1px solid var(--border-strong)",
               borderRadius: 5,
-              color: "#fff",
+              color: "var(--text-strong)",
               padding: "4px 10px",
               fontSize: 15,
               fontWeight: 600,
@@ -167,7 +169,7 @@ export default function GuidePage({ params }: { params: Params }) {
             onClick={() => setEditingTitle(true)}
             style={{
               flex: 1,
-              color: "#fff",
+              color: "var(--text-strong)",
               fontWeight: 600,
               fontSize: 15,
               cursor: "pointer",
@@ -220,19 +222,20 @@ export default function GuidePage({ params }: { params: Params }) {
         </div>
       </header>
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      <div className="guide-workspace" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {/* Sidebar */}
         <aside
+          className="guide-sidebar"
           style={{
             width: 220,
-            background: "#fff",
-            borderRight: "1px solid #e2e5ef",
+            background: "var(--surface)",
+            borderRight: "1px solid var(--border)",
             overflowY: "auto",
             flexShrink: 0,
           }}
         >
           {steps.length === 0 && (
-            <p style={{ padding: 16, color: "#9ca3af", fontSize: 12, lineHeight: 1.7 }}>
+            <p style={{ padding: 16, color: "var(--text-faint)", fontSize: 12, lineHeight: 1.7 }}>
               No steps yet.
               <br />
               Use the Chrome extension to record steps.
@@ -244,10 +247,10 @@ export default function GuidePage({ params }: { params: Params }) {
               onClick={() => setSelectedStep(step)}
               style={{
                 padding: "10px 12px",
-                borderBottom: "1px solid #e2e5ef",
+                borderBottom: "1px solid var(--border)",
                 cursor: "pointer",
-                background: selectedStep?.id === step.id ? "#f0f4ff" : "transparent",
-                borderLeft: selectedStep?.id === step.id ? "3px solid #1a6bff" : "3px solid transparent",
+                background: selectedStep?.id === step.id ? "var(--accent-soft)" : "transparent",
+                borderLeft: selectedStep?.id === step.id ? "3px solid var(--accent)" : "3px solid transparent",
                 display: "flex",
                 gap: 8,
                 alignItems: "center",
@@ -258,9 +261,9 @@ export default function GuidePage({ params }: { params: Params }) {
                 {step.type === "video" ? (
                   <div
                     style={{
-                      width: 52, height: 34, borderRadius: 4, border: "1px solid #e2e5ef",
-                      background: "#023465", display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#fff", fontSize: 10, fontWeight: 700,
+                      width: 52, height: 34, borderRadius: 4, border: "1px solid var(--border)",
+                      background: "var(--text-strong)", display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "var(--surface)", fontSize: 10, fontWeight: 700,
                     }}
                   >
                     video
@@ -269,14 +272,14 @@ export default function GuidePage({ params }: { params: Params }) {
                   <img
                     src={step.annotated_screenshot_url || step.screenshot_url!}
                     alt=""
-                    style={{ width: 52, height: 34, objectFit: "cover", borderRadius: 4, border: "1px solid #e2e5ef" }}
+                    style={{ width: 52, height: 34, objectFit: "cover", borderRadius: 4, border: "1px solid var(--border)" }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: 52, height: 34, borderRadius: 4, border: "1px solid #e2e5ef",
-                      background: "#f6f7fb", display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#9ca3af", fontSize: 10,
+                      width: 52, height: 34, borderRadius: 4, border: "1px solid var(--border)",
+                      background: "var(--page)", display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "var(--text-faint)", fontSize: 10,
                     }}
                   >
                     no img
@@ -287,7 +290,7 @@ export default function GuidePage({ params }: { params: Params }) {
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <span
                     style={{
-                      background: "#1a6bff", color: "#fff", borderRadius: "50%",
+                      background: "var(--accent)", color: "var(--on-accent)", borderRadius: "50%",
                       width: 16, height: 16, fontSize: 9, fontWeight: 700,
                       display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                     }}
@@ -298,16 +301,16 @@ export default function GuidePage({ params }: { params: Params }) {
                     {step.title}
                   </span>
                 </div>
-                <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>{step.type}</div>
+                <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 2 }}>{step.type}</div>
               </div>
             </div>
           ))}
         </aside>
 
         {/* Main content */}
-        <main style={{ flex: 1, overflowY: "auto", padding: 24 }}>
+        <main className="guide-content" style={{ flex: 1, overflowY: "auto", padding: 24 }}>
           {!selectedStep ? (
-            <div style={{ textAlign: "center", color: "#9ca3af", paddingTop: 80, fontSize: 14 }}>
+            <div style={{ textAlign: "center", color: "var(--text-faint)", paddingTop: 80, fontSize: 14 }}>
               Select a step from the sidebar
             </div>
           ) : (
@@ -326,9 +329,9 @@ export default function GuidePage({ params }: { params: Params }) {
 }
 
 const exportBtnStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.15)",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.3)",
+  background: "var(--surface-2)",
+  color: "var(--text-strong)",
+  border: "1px solid var(--border)",
   borderRadius: 6,
   padding: "5px 12px",
   fontSize: 12,
@@ -337,9 +340,9 @@ const exportBtnStyle: React.CSSProperties = {
 };
 
 const videoDownloadButtonStyle: React.CSSProperties = {
-  background: "#023465",
-  color: "#fff",
-  border: "1px solid #023465",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  border: "1px solid var(--accent)",
   borderRadius: 6,
   padding: "5px 11px",
   fontSize: 12,
@@ -382,7 +385,7 @@ function StepEditor({
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
         <span
           style={{
-            background: "#1a6bff", color: "#fff", borderRadius: "50%",
+            background: "var(--accent)", color: "var(--on-accent)", borderRadius: "50%",
             width: 28, height: 28, fontSize: 13, fontWeight: 700,
             display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}
@@ -396,12 +399,12 @@ function StepEditor({
           onKeyDown={(e) => e.key === "Enter" && onTitleSave(titleDraft)}
           style={{
             flex: 1, fontSize: 18, fontWeight: 600, border: "none", background: "transparent",
-            outline: "none", color: "#0d0f1a",
+            outline: "none", color: "var(--text-strong)",
           }}
         />
         <span
           style={{
-            background: "#f0f4ff", color: "#1a6bff", borderRadius: 5,
+            background: "var(--accent-soft)", color: "var(--accent)", borderRadius: 5,
             padding: "2px 8px", fontSize: 11, fontWeight: 500,
           }}
         >
@@ -415,7 +418,7 @@ function StepEditor({
         <button
           onClick={onDelete}
           style={{
-            border: "1px solid #fca5a5", background: "#fff", color: "#dc2626",
+            border: "1px solid var(--danger)", background: "var(--surface)", color: "var(--danger)",
             borderRadius: 6, padding: "4px 10px", fontSize: 12, cursor: "pointer",
           }}
         >
@@ -424,7 +427,7 @@ function StepEditor({
       </div>
 
       {step.description && (
-        <p style={{ color: "#6b7280", fontSize: 13, marginBottom: 16 }}>{step.description}</p>
+        <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>{step.description}</p>
       )}
 
       {/* Media */}
@@ -433,9 +436,9 @@ function StepEditor({
           src={mediaSrc}
           controls
           style={{
-            width: "100%", borderRadius: 10, border: "1px solid #e2e5ef",
+            width: "100%", borderRadius: 10, border: "1px solid var(--border)",
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            background: "#000",
+            background: "#111316",
           }}
         />
       ) : mediaSrc ? (
@@ -443,16 +446,16 @@ function StepEditor({
           src={mediaSrc}
           alt={`Step ${step.step_number}`}
           style={{
-            width: "100%", borderRadius: 10, border: "1px solid #e2e5ef",
+            width: "100%", borderRadius: 10, border: "1px solid var(--border)",
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}
         />
       ) : (
         <div
           style={{
-            height: 320, borderRadius: 10, border: "2px dashed #e2e5ef",
+            height: 320, borderRadius: 10, border: "2px dashed var(--border)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#9ca3af", fontSize: 13,
+            color: "var(--text-faint)", fontSize: 13,
           }}
         >
           No screenshot captured for this step
@@ -460,15 +463,15 @@ function StepEditor({
       )}
 
       {step.source_url && (
-        <div style={{ marginTop: 12, fontSize: 11, color: "#9ca3af" }}>
+        <div style={{ marginTop: 12, fontSize: 11, color: "var(--text-faint)" }}>
           Captured from:{" "}
-          <a href={step.source_url} target="_blank" rel="noreferrer" style={{ color: "#1a6bff" }}>
+          <a href={step.source_url} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>
             {step.source_url}
           </a>
         </div>
       )}
 
-      <div style={{ marginTop: 12, fontSize: 11, color: "#9ca3af" }}>
+      <div style={{ marginTop: 12, fontSize: 11, color: "var(--text-faint)" }}>
         Step {step.step_number} of {totalSteps}
       </div>
     </div>

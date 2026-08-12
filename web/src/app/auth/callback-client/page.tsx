@@ -107,19 +107,19 @@ export default function AuthCallbackPage() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#f0f4f8",
+      minHeight: "100vh", background: "var(--page)",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-sans)",
     }}>
       <div style={{ textAlign: "center" }}>
         <div style={{
           width: 40, height: 40, borderRadius: "50%",
-          border: "3px solid #023465", borderTopColor: "transparent",
+          border: "3px solid var(--text-strong)", borderTopColor: "transparent",
           margin: "0 auto 16px",
           animation: "spin 0.8s linear infinite",
         }} />
-        <p style={{ color: "#6b7280", fontSize: 15, margin: 0 }}>{message}</p>
+        <p style={{ color: "var(--text-muted)", fontSize: 15, margin: 0 }}>{message}</p>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

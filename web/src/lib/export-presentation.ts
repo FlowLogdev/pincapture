@@ -25,7 +25,7 @@ export async function createPresentationResponse(req: NextRequest, extension: "p
   pptx.author = "PinCapture";
   pptx.subject = title;
   pptx.title = title;
-  pptx.company = "Pinvest";
+  pptx.company = "PinCapture";
 
   for (const step of steps) {
     const slide = pptx.addSlide();

@@ -2,6 +2,7 @@
 
 import { type CSSProperties, type FormEvent, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 type CreatedTicket = {
   ticketId: string;
@@ -47,8 +48,7 @@ export default function SupportPage() {
     <main style={pageStyle}>
       <header style={headerStyle}>
         <Link href="/" style={brandStyle}>
-          <img src="/pinvest-logo.svg" alt="Pinvest" style={{ height: 22, filter: "brightness(0) invert(1)" }} />
-          <span style={pillStyle}>PinCapture</span>
+          <BrandLogo size="app" />
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Link href="/privacy" style={headerLinkStyle}>Privacy</Link>
@@ -67,11 +67,11 @@ export default function SupportPage() {
         {createdTicket ? (
           <div style={panelStyle}>
             <div style={successBadgeStyle}>Ticket created</div>
-            <h2 style={{ color: "#023465", fontSize: 24, margin: "12px 0 10px" }}>
+            <h2 style={{ color: "var(--text-strong)", fontSize: 24, margin: "12px 0 10px" }}>
               Ticket information has been sent
             </h2>
-            <p style={{ color: "#475569", lineHeight: 1.7, fontSize: 15, margin: "0 0 18px" }}>
-              Your support request was sent to support@flowlog.dev and fabio.almeida@pinvestcapital.com.
+            <p style={{ color: "var(--text-muted)", lineHeight: 1.7, fontSize: 15, margin: "0 0 18px" }}>
+              Your support request was sent to support@flowlog.dev.
               A copy was also sent to {createdTicket.requesterEmail}.
             </p>
             <div style={ticketSummaryStyle}>
@@ -104,9 +104,9 @@ export default function SupportPage() {
         ) : (
         <div style={panelStyle}>
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ color: "#023465", fontSize: 20, margin: "0 0 8px" }}>Open a support ticket</h2>
-            <p style={{ color: "#64748b", lineHeight: 1.65, fontSize: 14, margin: 0 }}>
-              A ticket copy is sent to the requester, support@flowlog.dev, and fabio.almeida@pinvestcapital.com.
+            <h2 style={{ color: "var(--text-strong)", fontSize: 20, margin: "0 0 8px" }}>Open a support ticket</h2>
+            <p style={{ color: "var(--text-muted)", lineHeight: 1.65, fontSize: 14, margin: 0 }}>
+              A ticket copy is sent to the requester and support@flowlog.dev.
             </p>
           </div>
 
@@ -142,7 +142,7 @@ export default function SupportPage() {
           {status && (
             <p style={{
               margin: "14px 0 0",
-              color: status.includes("created") ? "#166534" : "#dc2626",
+              color: status.includes("created") ? "var(--success)" : "var(--danger)",
               fontSize: 14,
               lineHeight: 1.5,
             }}>
@@ -162,14 +162,15 @@ export default function SupportPage() {
 
 const pageStyle: CSSProperties = {
   minHeight: "100vh",
-  background: "#f6f7fb",
-  color: "#0f172a",
-  fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  background: "var(--page)",
+  color: "var(--text)",
+  fontFamily: "var(--font-sans)",
 };
 
 const headerStyle: CSSProperties = {
   height: 64,
-  background: "#023465",
+  background: "var(--surface)",
+  borderBottom: "1px solid var(--border)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -183,17 +184,8 @@ const brandStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const pillStyle: CSSProperties = {
-  background: "rgba(255,221,0,0.16)",
-  color: "#ffdd00",
-  borderRadius: 5,
-  padding: "3px 9px",
-  fontSize: 11,
-  fontWeight: 800,
-};
-
 const headerLinkStyle: CSSProperties = {
-  color: "rgba(255,255,255,0.78)",
+  color: "var(--text-muted)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 700,
@@ -201,8 +193,8 @@ const headerLinkStyle: CSSProperties = {
 };
 
 const primaryHeaderLinkStyle: CSSProperties = {
-  color: "#023465",
-  background: "#ffdd00",
+  color: "var(--on-accent)",
+  background: "var(--accent)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 800,
@@ -212,7 +204,7 @@ const primaryHeaderLinkStyle: CSSProperties = {
 
 const eyebrowStyle: CSSProperties = {
   margin: "0 0 8px",
-  color: "#64748b",
+  color: "var(--text-muted)",
   fontSize: 12,
   fontWeight: 800,
   textTransform: "uppercase",
@@ -221,7 +213,7 @@ const eyebrowStyle: CSSProperties = {
 
 const titleStyle: CSSProperties = {
   margin: "0 0 14px",
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 36,
   lineHeight: 1.15,
   letterSpacing: 0,
@@ -229,14 +221,14 @@ const titleStyle: CSSProperties = {
 
 const introStyle: CSSProperties = {
   margin: "0 0 24px",
-  color: "#475569",
+  color: "var(--text-muted)",
   lineHeight: 1.7,
   fontSize: 16,
 };
 
 const panelStyle: CSSProperties = {
-  background: "#fff",
-  border: "1px solid #dbe3ef",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 28,
   boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
@@ -245,24 +237,24 @@ const panelStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   display: "grid",
   gap: 6,
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 13,
   fontWeight: 800,
 };
 
 const inputStyle: CSSProperties = {
   width: "100%",
-  border: "1px solid #cbd5e1",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "10px 11px",
   font: "inherit",
   fontSize: 14,
-  color: "#0f172a",
+  color: "var(--text)",
 };
 
 const buttonStyle: CSSProperties = {
-  background: "#023465",
-  color: "#fff",
+  background: "var(--text-strong)",
+  color: "var(--surface)",
   border: 0,
   borderRadius: 7,
   padding: "12px 14px",
@@ -271,9 +263,9 @@ const buttonStyle: CSSProperties = {
 };
 
 const secondaryButtonStyle: CSSProperties = {
-  background: "#fff",
-  color: "#023465",
-  border: "1px solid #cbd5e1",
+  background: "var(--surface)",
+  color: "var(--text-strong)",
+  border: "1px solid var(--border-strong)",
   borderRadius: 7,
   padding: "12px 14px",
   fontWeight: 800,
@@ -283,8 +275,8 @@ const secondaryButtonStyle: CSSProperties = {
 
 const successBadgeStyle: CSSProperties = {
   display: "inline-flex",
-  background: "#dcfce7",
-  color: "#166534",
+  background: "var(--success-soft)",
+  color: "var(--success)",
   borderRadius: 999,
   padding: "6px 10px",
   fontSize: 12,
@@ -295,15 +287,15 @@ const ticketSummaryStyle: CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
   gap: 12,
-  background: "#f8fafc",
-  border: "1px solid #e2e8f0",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: 16,
 };
 
 const summaryLabelStyle: CSSProperties = {
   display: "block",
-  color: "#64748b",
+  color: "var(--text-muted)",
   fontSize: 12,
   fontWeight: 800,
   marginBottom: 4,
@@ -311,14 +303,14 @@ const summaryLabelStyle: CSSProperties = {
 
 const summaryValueStyle: CSSProperties = {
   display: "block",
-  color: "#023465",
+  color: "var(--text-strong)",
   fontSize: 15,
   lineHeight: 1.35,
 };
 
 const progressTrackStyle: CSSProperties = {
   height: 12,
-  background: "#e2e8f0",
+  background: "var(--border)",
   borderRadius: 999,
   overflow: "hidden",
   marginTop: 18,
@@ -326,13 +318,13 @@ const progressTrackStyle: CSSProperties = {
 
 const progressFillStyle: CSSProperties = {
   height: "100%",
-  background: "#22c55e",
+  background: "var(--success)",
   borderRadius: 999,
 };
 
 const footerStyle: CSSProperties = {
   padding: "0 24px 34px",
   textAlign: "center",
-  color: "#94a3b8",
+  color: "var(--text-faint)",
   fontSize: 13,
 };

@@ -12,6 +12,8 @@
   ],
   "host_permissions": [
     "<all_urls>",
+    "https://www.pincapturetool.com/*",
+    "https://pincapturetool.com/*",
     "https://pincapture.flowlog.dev/*"
   ],
   "background": {

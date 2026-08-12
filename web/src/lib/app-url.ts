@@ -4,5 +4,5 @@ export function getPublicAppUrl() {
     return configured;
   }
 
-  return "https://pincapture.flowlog.dev";
+  return "https://www.pincapturetool.com";
 }

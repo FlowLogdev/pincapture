@@ -1,4 +1,4 @@
-const APP_URL = "https://pincapture.flowlog.dev";
+const APP_URL = "https://www.pincapturetool.com";
 
 let recording = false;
 let steps = [];

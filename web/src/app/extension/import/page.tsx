@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 
 type ImportMessage = {
   source?: string;
@@ -69,16 +70,16 @@ export default function ExtensionImportPage() {
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#f6f7fb",
+      background: "var(--page)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-sans)",
       padding: 24,
     }}>
       <section style={{
-        background: "#fff",
-        border: "1px solid #e2e8f0",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 12,
         padding: 32,
         width: "100%",
@@ -86,30 +87,21 @@ export default function ExtensionImportPage() {
         textAlign: "center",
         boxShadow: "0 6px 24px rgba(15,23,42,0.08)",
       }}>
-        <div style={{
-          display: "inline-flex",
-          background: "#023465",
-          color: "#ffdd00",
-          borderRadius: 7,
-          padding: "5px 12px",
-          fontSize: 13,
-          fontWeight: 800,
-          marginBottom: 18,
-        }}>
-          PinCapture
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+          <BrandLogo size="app" />
         </div>
-        <h1 style={{ margin: "0 0 8px", color: "#023465", fontSize: 22 }}>
+        <h1 style={{ margin: "0 0 8px", color: "var(--text-strong)", fontSize: 22 }}>
           Importing capture
         </h1>
-        <p style={{ margin: 0, color: "#64748b", fontSize: 14, lineHeight: 1.6 }}>
+        <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>
           {status}
         </p>
         {error && (
           <p style={{
             margin: "18px 0 0",
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#dc2626",
+            background: "var(--danger-soft)",
+            border: "1px solid var(--danger)",
+            color: "var(--danger)",
             borderRadius: 8,
             padding: 10,
             fontSize: 13,

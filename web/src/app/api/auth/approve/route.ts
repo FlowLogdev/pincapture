@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
   const { error: emailError } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: pending.email,
-    subject: "You're approved — sign in to PinCapture",
+    subject: "You're approved: sign in to PinCapture",
     html: buildWelcomeEmail(firstName, magicLink),
   });
 
@@ -111,7 +111,7 @@ function htmlResponse(title: string, message: string, success: boolean): NextRes
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>${title} — PinCapture</title>
+  <title>${title} | PinCapture</title>
 </head>
 <body style="margin:0;padding:0;background:#f0f4f8;font-family:-apple-system,system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:14px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(2,52,101,0.09);border:1px solid #e5e7eb;">
@@ -142,8 +142,7 @@ function buildWelcomeEmail(firstName: string, link: string): string {
 
         <tr>
           <td style="background:linear-gradient(135deg,#023465 0%,#011d3a 100%);padding:26px 32px;">
-            <span style="color:#fff;font-size:21px;font-weight:800;letter-spacing:-0.5px;">Pinvest</span>
-            <span style="background:rgba(255,221,0,0.2);color:#FFDD00;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;margin-left:8px;letter-spacing:0.3px;">PinCapture</span>
+            <span style="color:#fff;font-size:21px;font-weight:800;letter-spacing:-0.5px;">PinCapture</span>
           </td>
         </tr>
 
@@ -153,7 +152,7 @@ function buildWelcomeEmail(firstName: string, link: string): string {
               You've been approved, ${firstName}!
             </p>
             <p style="margin:0 0 28px;color:#4b5563;font-size:15px;line-height:1.65;">
-              Your access to PinCapture has been approved. Click below to sign in — this link expires in <strong>1 hour</strong> and can only be used once.
+              Your access to PinCapture has been approved. Click below to sign in. This link expires in <strong>1 hour</strong> and can only be used once.
             </p>
             <a href="${link}" style="display:inline-block;background:#FFDD00;color:#023465;font-weight:700;font-size:15px;padding:14px 30px;border-radius:9px;text-decoration:none;letter-spacing:-0.2px;">
               Sign in to PinCapture →
@@ -167,7 +166,7 @@ function buildWelcomeEmail(firstName: string, link: string): string {
 
         <tr>
           <td style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;">
-            <p style="margin:0;color:#9ca3af;font-size:12px;">© 2026 Pinvest LLC. All rights reserved.</p>
+            <p style="margin:0;color:#9ca3af;font-size:12px;">© 2026 PinCapture. All rights reserved.</p>
           </td>
         </tr>
 

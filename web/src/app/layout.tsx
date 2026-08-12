@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "PinCapture — Turn any browser workflow into a shareable guide",
+  title: "PinCapture | Screen capture and process documentation",
   description:
-    "PinCapture records your clicks and annotations as you work, then exports step-by-step guides as Word, PDF, or PowerPoint documentation for your team.",
+    "Record browser workflows, create step-by-step guides, and export polished documentation or MP4 videos for your team.",
+  icons: {
+    icon: "/pincapture-icon.svg",
+    shortcut: "/pincapture-icon.svg",
+    apple: "/pincapture-icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

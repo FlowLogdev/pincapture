@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -76,42 +77,39 @@ function LoginForm() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#f0f4f8",
+      minHeight: "100vh", background: "var(--page)",
       display: "flex", flexDirection: "column", alignItems: "center",
       justifyContent: "center", padding: 24,
-      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-sans)",
     }}>
       <div style={{ marginBottom: 32 }}>
-        <img src="/pinvest-logo.svg" alt="Pinvest" style={{ height: 28 }} />
+        <Link href="/" aria-label="PinCapture home" style={{ display: "block" }}>
+          <BrandLogo size="auth" />
+        </Link>
       </div>
 
       <div style={{
-        background: "#fff", borderRadius: 14,
+        background: "var(--surface)", borderRadius: 14,
         padding: "42px 38px", width: "100%", maxWidth: 420,
-        boxShadow: "0 4px 24px rgba(2,52,101,0.09)",
-        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 24px rgb(20 23 26 / 0.07)",
+        border: "1px solid var(--border)",
       }}>
         {success ? (
           <div style={{ textAlign: "center" }}>
-            <div style={{
-              width: 64, height: 64, borderRadius: "50%",
-              background: "#f0f7ff", border: "2px solid #bfdbfe",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 28, margin: "0 auto 20px",
-            }}>
-              📬
+            <div style={{ color: "var(--accent)", fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 14 }}>
+              SIGN-IN LINK SENT
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: "#023465", margin: "0 0 10px" }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-strong)", margin: "0 0 10px" }}>
               Check your inbox
             </h2>
-            <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.65, margin: "0 0 20px" }}>
-              We sent a sign-in link to <strong>{email}</strong>. Click it to access PinCapture — it expires in 1 hour.
+            <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.65, margin: "0 0 20px" }}>
+              We sent a sign-in link to <strong>{email}</strong>. Click it to access PinCapture. It expires in 1 hour.
             </p>
-            <p style={{ color: "#9ca3af", fontSize: 13, margin: 0 }}>
+            <p style={{ color: "var(--text-faint)", fontSize: 13, margin: 0 }}>
               Didn't get it? Check spam or{" "}
               <button
                 onClick={() => setSuccess(false)}
-                style={{ color: "#023465", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 13 }}
+                style={{ color: "var(--text-strong)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 13 }}
               >
                 try again
               </button>.
@@ -121,17 +119,17 @@ function LoginForm() {
           <>
             <div style={{ textAlign: "center", marginBottom: 30 }}>
               <div style={{
-                display: "inline-flex", background: "#023465",
+                display: "inline-flex", background: "var(--text-strong)",
                 borderRadius: 8, padding: "5px 14px", marginBottom: 18,
               }}>
-                <span style={{ color: "#FFDD00", fontWeight: 700, fontSize: 13, letterSpacing: 0.3 }}>
+                <span style={{ color: "var(--accent)", fontWeight: 700, fontSize: 13, letterSpacing: 0.3 }}>
                   PinCapture
                 </span>
               </div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: "#023465", margin: "0 0 6px" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-strong)", margin: "0 0 6px" }}>
                 Sign in to PinCapture
               </h1>
-              <p style={{ color: "#6b7280", fontSize: 14, margin: 0 }}>
+              <p style={{ color: "var(--text-muted)", fontSize: 14, margin: 0 }}>
                 {mode === "magic" ? "We'll send a sign-in link to your email" : "Use your approved demo password"}
               </p>
             </div>
@@ -140,7 +138,7 @@ function LoginForm() {
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               gap: 6,
-              background: "#f1f5f9",
+              background: "var(--surface-2)",
               borderRadius: 8,
               padding: 4,
               marginBottom: 18,
@@ -157,7 +155,7 @@ function LoginForm() {
               <div style={{ marginBottom: 22 }}>
                 <label style={{
                   display: "block", fontSize: 13, fontWeight: 600,
-                  color: "#374151", marginBottom: 6,
+                  color: "var(--text)", marginBottom: 6,
                 }}>
                   Work email
                 </label>
@@ -165,17 +163,17 @@ function LoginForm() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@pinvestcapital.com"
+                  placeholder="you@company.com"
                   required
                   autoFocus
                   style={{
                     width: "100%", padding: "10px 13px",
-                    borderRadius: 8, border: "1px solid #d1d5db",
+                    borderRadius: 8, border: "1px solid var(--border-strong)",
                     fontSize: 14, outline: "none", boxSizing: "border-box",
-                    fontFamily: "system-ui",
+                    fontFamily: "inherit",
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = "#023465")}
-                  onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
                 />
               </div>
 
@@ -183,7 +181,7 @@ function LoginForm() {
                 <div style={{ marginBottom: 22 }}>
                   <label style={{
                     display: "block", fontSize: 13, fontWeight: 600,
-                    color: "#374151", marginBottom: 6,
+                    color: "var(--text)", marginBottom: 6,
                   }}>
                     Password
                   </label>
@@ -195,21 +193,21 @@ function LoginForm() {
                     required
                     style={{
                       width: "100%", padding: "10px 13px",
-                      borderRadius: 8, border: "1px solid #d1d5db",
+                      borderRadius: 8, border: "1px solid var(--border-strong)",
                       fontSize: 14, outline: "none", boxSizing: "border-box",
-                      fontFamily: "system-ui",
+                      fontFamily: "inherit",
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = "#023465")}
-                    onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+                    onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
+                    onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
                   />
                 </div>
               )}
 
               {error && (
                 <div style={{
-                  background: "#fef2f2", border: "1px solid #fca5a5",
+                  background: "var(--danger-soft)", border: "1px solid var(--danger)",
                   borderRadius: 8, padding: "10px 14px",
-                  marginBottom: 16, fontSize: 13, color: "#dc2626",
+                  marginBottom: 16, fontSize: 13, color: "var(--danger)",
                   lineHeight: 1.5,
                 }}>
                   {error}
@@ -221,20 +219,20 @@ function LoginForm() {
                 disabled={loading}
                 style={{
                   width: "100%", padding: "12px",
-                  background: loading ? "#4b7abf" : "#023465",
-                  color: "#fff", border: "none", borderRadius: 8,
+                  background: loading ? "var(--accent-hover)" : "var(--text-strong)",
+                  color: "var(--surface)", border: "none", borderRadius: 8,
                   fontSize: 15, fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
-                  fontFamily: "system-ui", transition: "background 0.15s",
+                  fontFamily: "inherit", transition: "background 0.15s",
                 }}
               >
                 {loading ? (mode === "password" ? "Signing in..." : "Sending link...") : (mode === "password" ? "Sign in" : "Send sign-in link ->")}
               </button>
             </form>
 
-            <p style={{ textAlign: "center", fontSize: 13, color: "#9ca3af", marginTop: 22, marginBottom: 0 }}>
+            <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-faint)", marginTop: 22, marginBottom: 0 }}>
               Don't have an account?{" "}
-              <Link href="/register" style={{ color: "#023465", fontWeight: 600, textDecoration: "none" }}>
+              <Link href="/register" style={{ color: "var(--text-strong)", fontWeight: 600, textDecoration: "none" }}>
                 Create one
               </Link>
             </p>
@@ -242,8 +240,8 @@ function LoginForm() {
         )}
       </div>
 
-      <p style={{ marginTop: 28, fontSize: 12, color: "#9ca3af" }}>
-        © 2026 Pinvest LLC
+      <p style={{ marginTop: 28, fontSize: 12, color: "var(--text-faint)" }}>
+        © 2026 PinCapture
       </p>
     </div>
   );
@@ -254,8 +252,8 @@ function modeButtonStyle(active: boolean): React.CSSProperties {
     border: 0,
     borderRadius: 6,
     padding: "8px 10px",
-    background: active ? "#023465" : "transparent",
-    color: active ? "#fff" : "#023465",
+    background: active ? "var(--text-strong)" : "transparent",
+    color: active ? "var(--surface)" : "var(--text-strong)",
     fontSize: 13,
     fontWeight: 700,
     cursor: "pointer",

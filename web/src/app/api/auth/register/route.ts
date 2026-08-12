@@ -71,8 +71,8 @@ export async function POST(req: NextRequest) {
 
   const { error: emailError } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
-    to: ["fabio.almeida@pinvestcapital.com", "support@flowlog.dev"],
-    subject: `New PinCapture access request — ${fullName.trim()}`,
+    to: ["support@flowlog.dev"],
+    subject: `New PinCapture access request: ${fullName.trim()}`,
     html: buildApprovalEmail(fullName.trim(), email.trim(), approveUrl, denyUrl),
   });
 
@@ -103,8 +103,7 @@ function buildApprovalEmail(
 
         <tr>
           <td style="background:linear-gradient(135deg,#023465 0%,#011d3a 100%);padding:26px 32px;">
-            <span style="color:#fff;font-size:21px;font-weight:800;letter-spacing:-0.5px;">Pinvest</span>
-            <span style="background:rgba(255,221,0,0.2);color:#FFDD00;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;margin-left:8px;letter-spacing:0.3px;">PinCapture</span>
+            <span style="color:#fff;font-size:21px;font-weight:800;letter-spacing:-0.5px;">PinCapture</span>
           </td>
         </tr>
 
@@ -156,7 +155,7 @@ function buildApprovalEmail(
 
         <tr>
           <td style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;">
-            <p style="margin:0;color:#9ca3af;font-size:12px;">© 2026 Pinvest LLC. All rights reserved.</p>
+            <p style="margin:0;color:#9ca3af;font-size:12px;">© 2026 PinCapture. All rights reserved.</p>
           </td>
         </tr>
 
