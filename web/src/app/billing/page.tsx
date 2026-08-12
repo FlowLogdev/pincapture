@@ -4,16 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/lib/supabase";
-
-type PlanId = "solo" | "team";
-type Interval = "monthly" | "yearly";
+import { PricingPlans, type Interval, type PlanId } from "@/components/pricing-plans";
 
 export default function BillingPage() {
-  const [interval, setInterval] = useState<Interval>("monthly");
   const [loadingPlan, setLoadingPlan] = useState<PlanId | null>(null);
   const [error, setError] = useState("");
 
-  async function subscribe(plan: PlanId) {
+  async function subscribe(plan: PlanId, interval: Interval) {
     setError("");
     setLoadingPlan(plan);
 
@@ -69,32 +66,6 @@ export default function BillingPage() {
               <p className="section-copy">
                 Your account is confirmed — pick a plan to start capturing and sharing documentation.
               </p>
-              <div className="pricing-note">
-                <div
-                  role="tablist"
-                  aria-label="Billing interval"
-                  style={{ display: "inline-flex", gap: 6, background: "var(--surface-2)", borderRadius: 8, padding: 4, marginTop: 8 }}
-                >
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={interval === "monthly"}
-                    onClick={() => setInterval("monthly")}
-                    style={intervalButtonStyle(interval === "monthly")}
-                  >
-                    Monthly
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={interval === "yearly"}
-                    onClick={() => setInterval("yearly")}
-                    style={intervalButtonStyle(interval === "yearly")}
-                  >
-                    Yearly — save 2 months
-                  </button>
-                </div>
-              </div>
             </div>
 
             {error && (
@@ -107,86 +78,10 @@ export default function BillingPage() {
               </div>
             )}
 
-            <div className="pricing-plans">
-              <article className="pricing-plan">
-                <div className="pricing-plan-header">
-                  <div>
-                    <span className="pricing-plan-name">Solo</span>
-                    <p>For one person documenting recurring work.</p>
-                  </div>
-                  <div className="pricing-price">
-                    <strong>${interval === "monthly" ? "12.99" : "10.83"}</strong>
-                    <span>per month</span>
-                  </div>
-                </div>
-                <ul className="pricing-features">
-                  <li>One user account</li>
-                  <li>Screenshot guides and screen recordings</li>
-                  <li>MP4 videos up to 10 minutes</li>
-                  <li>Word, PDF, PowerPoint, and slideshow exports</li>
-                  <li>Video downloads, archive, and recovery</li>
-                </ul>
-                <div className="pricing-plan-footer">
-                  <span>{interval === "yearly" ? "$129.99 billed yearly" : "Billed monthly"}</span>
-                  <button
-                    type="button"
-                    className="button-secondary"
-                    disabled={loadingPlan !== null}
-                    onClick={() => subscribe("solo")}
-                  >
-                    {loadingPlan === "solo" ? "Redirecting…" : "Subscribe →"}
-                  </button>
-                </div>
-              </article>
-
-              <article className="pricing-plan pricing-plan-featured">
-                <div className="pricing-plan-header">
-                  <div>
-                    <span className="pricing-plan-name">Team</span>
-                    <p>For a small team standardizing how work gets done.</p>
-                  </div>
-                  <div className="pricing-price">
-                    <strong>${interval === "monthly" ? "39.99" : "33.33"}</strong>
-                    <span>per month</span>
-                  </div>
-                </div>
-                <ul className="pricing-features">
-                  <li>Up to five user accounts</li>
-                  <li>Everything in Solo</li>
-                  <li>Priority support</li>
-                  <li>Guide and recording organization</li>
-                  <li>Support ticket workflow</li>
-                </ul>
-                <div className="pricing-plan-footer">
-                  <span>{interval === "yearly" ? "$399.99 billed yearly" : "Billed monthly"}</span>
-                  <button
-                    type="button"
-                    className="button-primary"
-                    disabled={loadingPlan !== null}
-                    onClick={() => subscribe("team")}
-                  >
-                    {loadingPlan === "team" ? "Redirecting…" : "Subscribe →"}
-                  </button>
-                </div>
-              </article>
-            </div>
+            <PricingPlans onSelect={subscribe} loadingPlan={loadingPlan} />
           </div>
         </section>
       </main>
     </div>
   );
-}
-
-function intervalButtonStyle(active: boolean): React.CSSProperties {
-  return {
-    border: 0,
-    borderRadius: 6,
-    padding: "8px 14px",
-    background: active ? "var(--text-strong)" : "transparent",
-    color: active ? "var(--surface)" : "var(--text-strong)",
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    fontFamily: "inherit",
-  };
 }

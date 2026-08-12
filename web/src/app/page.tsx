@@ -48,7 +48,7 @@ export default function Home() {
             <a href="#product">Product</a>
             <a href="#workflow">How it works</a>
             <a href="#formats">Formats</a>
-            <a href="#pricing">Pricing</a>
+            <Link href="/pricing">Pricing</Link>
             <Link href="/docs">Docs</Link>
           </nav>
 
@@ -154,62 +154,9 @@ export default function Home() {
               <span className="section-eyebrow">Simple pricing</span>
               <h2 className="section-heading">Simple pricing for work worth repeating.</h2>
               <p className="section-copy">
-                Start lean, prove the workflow, and expand when more people need to capture and share documentation.
+                Solo starts at $12.99/mo, Team at $39.99/mo — save two months with annual billing.
               </p>
-              <div className="pricing-note">
-                <strong>Save two months with annual billing.</strong>
-                <span>Need more than five users? Contact support for volume pricing.</span>
-              </div>
-            </div>
-
-            <div className="pricing-plans">
-              <article className="pricing-plan">
-                <div className="pricing-plan-header">
-                  <div>
-                    <span className="pricing-plan-name">Solo</span>
-                    <p>For one person documenting recurring work.</p>
-                  </div>
-                  <div className="pricing-price">
-                    <strong>$12.99</strong>
-                    <span>per month</span>
-                  </div>
-                </div>
-                <ul className="pricing-features">
-                  <li>One user account</li>
-                  <li>Screenshot guides and screen recordings</li>
-                  <li>MP4 videos up to 10 minutes</li>
-                  <li>Word, PDF, PowerPoint, and slideshow exports</li>
-                  <li>Video downloads, archive, and recovery</li>
-                </ul>
-                <div className="pricing-plan-footer">
-                  <span>$129.99 billed yearly</span>
-                  <Link href="/register" className="button-secondary">Get started</Link>
-                </div>
-              </article>
-
-              <article className="pricing-plan pricing-plan-featured">
-                <div className="pricing-plan-header">
-                  <div>
-                    <span className="pricing-plan-name">Team</span>
-                    <p>For a small team standardizing how work gets done.</p>
-                  </div>
-                  <div className="pricing-price">
-                    <strong>$39.99</strong>
-                    <span>per month</span>
-                  </div>
-                </div>
-                <ul className="pricing-features">
-                  <li>Up to five user accounts</li>
-                  <li>Everything in Solo</li>
-                  <li>Priority support</li>
-                  <li>Guide and recording organization</li>
-                  <li>Support ticket workflow</li>
-                </ul>
-                <div className="pricing-plan-footer">
-                  <span>$399.99 billed yearly</span>
-                  <Link href="/register" className="button-primary">Get started</Link>
-                </div>
-              </article>
+              <Link href="/pricing" className="button-primary">See full pricing →</Link>
             </div>
           </div>
         </section>
