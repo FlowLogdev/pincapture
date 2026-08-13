@@ -1,38 +1,10 @@
 "use client";
 
-import { type CSSProperties, type FormEvent, type ReactNode, useState } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing-nav";
+import { SupportTicketForm } from "@/components/support-ticket-form";
 
 export default function DocsPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [subject, setSubject] = useState("PinCapture support request");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
-  const [sending, setSending] = useState(false);
-
-  async function submitTicket(event: FormEvent) {
-    event.preventDefault();
-    setSending(true);
-    setStatus("");
-
-    try {
-      const res = await fetch("/api/support/tickets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, subject, message }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not submit support ticket.");
-      setStatus(`Ticket ${data.ticketId} created. A copy was sent to your email.`);
-      setMessage("");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Could not submit support ticket.");
-    } finally {
-      setSending(false);
-    }
-  }
-
   return (
     <main style={{ minHeight: "100vh", background: "var(--page)", fontFamily: "var(--font-sans)", color: "var(--text)" }}>
       <MarketingHeader />
@@ -83,16 +55,7 @@ export default function DocsPage() {
             <p style={{ color: "var(--text-muted)", lineHeight: 1.6, fontSize: 14, margin: "0 0 16px" }}>
               A ticket copy is sent to the requester and support@flowlog.dev.
             </p>
-            <form onSubmit={submitTicket} style={{ display: "grid", gap: 10 }}>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" style={inputStyle} />
-              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" type="email" required style={inputStyle} />
-              <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" required style={inputStyle} />
-              <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Describe the issue, page URL, guide name, and exact steps." required rows={7} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} />
-              <button disabled={sending} style={buttonStyle}>
-                {sending ? "Creating ticket..." : "Create support ticket"}
-              </button>
-            </form>
-            {status && <p style={{ margin: "12px 0 0", color: status.includes("created") ? "var(--success)" : "var(--danger)", fontSize: 13, lineHeight: 1.5 }}>{status}</p>}
+            <SupportTicketForm />
           </aside>
         </div>
       </div>
@@ -117,23 +80,3 @@ const panelStyle: CSSProperties = {
   borderRadius: 8,
   padding: 24,
 };
-
-const inputStyle: CSSProperties = {
-  width: "100%",
-  border: "1px solid var(--border-strong)",
-  borderRadius: 7,
-  padding: "10px 11px",
-  font: "inherit",
-  fontSize: 14,
-};
-
-const buttonStyle: CSSProperties = {
-  background: "var(--text-strong)",
-  color: "var(--surface)",
-  border: 0,
-  borderRadius: 7,
-  padding: "11px 14px",
-  fontWeight: 800,
-  cursor: "pointer",
-};
-

@@ -7,6 +7,6 @@ type EntitlementProfile = {
 
 export function isEntitled(profile: EntitlementProfile | null | undefined): boolean {
   if (!profile) return false;
-  if (ADMIN_EMAILS.includes((profile.email || "").toLowerCase())) return true;
+  if (ADMIN_EMAILS.includes((profile.email || "").trim().toLowerCase())) return true;
   return profile.subscription_status === "active" || profile.subscription_status === "trialing";
 }
