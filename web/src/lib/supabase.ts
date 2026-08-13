@@ -1,9 +1,15 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Cookie-based client (not plain supabase-js's localStorage-based client) so
+// this shares the exact same session as middleware.ts and the server routes
+// (createServerClient / createSupabaseServerClient), which all read the
+// sb-*-auth-token cookies. A mismatched client here means signOut(),
+// getSession(), and getUser() silently operate on an empty session that's
+// disconnected from the real cookie-based login.
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 export type Guide = {
   id: string;
