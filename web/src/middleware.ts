@@ -41,15 +41,15 @@ export async function middleware(request: NextRequest) {
     path === "/login" ||
     path === "/register" ||
     path === "/check-email";
-  const isRoot = path === "/";
 
   // Unauthenticated: block protected routes
   if (!user && isProtected) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
-  // Authenticated: skip all auth/landing pages → go straight to dashboard
-  if (user && (isAuthPage || isRoot)) {
+  // Authenticated: skip past login/register/check-email → go straight to dashboard.
+  // The homepage always shows the landing page regardless of auth state.
+  if (user && isAuthPage) {
     return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
   }
 
@@ -75,5 +75,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/guide/:path*", "/login", "/register", "/check-email", "/billing", "/refund"],
+  matcher: ["/dashboard/:path*", "/guide/:path*", "/login", "/register", "/check-email", "/billing", "/refund"],
 };
