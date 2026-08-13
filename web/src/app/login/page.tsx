@@ -204,6 +204,9 @@ function LoginForm() {
                     onFocus={(e) => (e.target.style.borderColor = "var(--text-strong)")}
                     onBlur={(e) => (e.target.style.borderColor = "var(--border-strong)")}
                   />
+                  <Link href="/forgot-password" style={{ display: "block", textAlign: "right", marginTop: 8, fontSize: 13, color: "var(--text-faint)", textDecoration: "none" }}>
+                    Forgot password?
+                  </Link>
                 </div>
               )}
 
