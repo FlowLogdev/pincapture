@@ -7,7 +7,7 @@ export function GoogleSignInButton() {
   async function handleClick() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${getPublicAppUrl()}/auth/callback` },
+      options: { redirectTo: `${getPublicAppUrl()}/auth/callback-client` },
     });
   }
 
