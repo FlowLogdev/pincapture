@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
+import { GoogleSignInButton, AuthDivider } from "@/components/google-signin-button";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -84,6 +85,9 @@ export default function RegisterPage() {
             Start capturing and documenting your workflows in minutes
           </p>
         </div>
+
+        <GoogleSignInButton />
+        <AuthDivider label="OR" />
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>

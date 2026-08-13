@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const requiresEntitlement = path.startsWith("/dashboard") || path.startsWith("/guide") || path.startsWith("/docs");
+  const requiresEntitlement = path.startsWith("/dashboard") || path.startsWith("/guide");
   const isProtected = requiresEntitlement || path === "/billing" || path === "/refund";
   const isAuthPage =
     path === "/login" ||
@@ -75,5 +75,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/guide/:path*", "/docs/:path*", "/login", "/register", "/check-email", "/billing", "/refund"],
+  matcher: ["/", "/dashboard/:path*", "/guide/:path*", "/login", "/register", "/check-email", "/billing", "/refund"],
 };

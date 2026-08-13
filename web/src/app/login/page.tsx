@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/lib/supabase";
+import { GoogleSignInButton, AuthDivider } from "@/components/google-signin-button";
 
 export default function LoginPage() {
   return (
@@ -133,6 +134,9 @@ function LoginForm() {
                 {mode === "magic" ? "We'll send a sign-in link to your email" : "Use your account password"}
               </p>
             </div>
+
+            <GoogleSignInButton />
+            <AuthDivider label="OR" />
 
             <div style={{
               display: "grid",

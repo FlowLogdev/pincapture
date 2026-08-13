@@ -1,8 +1,7 @@
 "use client";
 
 import { type CSSProperties, type FormEvent, type ReactNode, useState } from "react";
-import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
+import { MarketingHeader, MarketingFooter } from "@/components/marketing-nav";
 
 export default function DocsPage() {
   const [email, setEmail] = useState("");
@@ -36,20 +35,7 @@ export default function DocsPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--page)", fontFamily: "var(--font-sans)", color: "var(--text)" }}>
-      <header style={{
-        background: "var(--surface)",
-        borderBottom: "1px solid var(--border)",
-        height: 56,
-        padding: "0 28px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}>
-        <Link href="/dashboard" aria-label="PinCapture dashboard" style={{ display: "block" }}>
-          <BrandLogo size="app" />
-        </Link>
-        <Link href="/dashboard" style={headerLink}>Dashboard</Link>
-      </header>
+      <MarketingHeader />
 
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "34px 22px 64px" }}>
         <h1 style={{ color: "var(--text-strong)", fontSize: 28, margin: "0 0 8px" }}>PinCapture Docs</h1>
@@ -110,6 +96,8 @@ export default function DocsPage() {
           </aside>
         </div>
       </div>
+
+      <MarketingFooter />
     </main>
   );
 }
@@ -149,12 +137,3 @@ const buttonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const headerLink: CSSProperties = {
-  color: "var(--on-accent)",
-  background: "var(--accent)",
-  textDecoration: "none",
-  fontSize: 13,
-  fontWeight: 800,
-  padding: "9px 14px",
-  borderRadius: 7,
-};
